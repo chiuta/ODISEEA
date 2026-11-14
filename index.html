@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ODISEEA — Documentar Voyager 1 și 2 (2D / 3D SBS)</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#07090f;color:#dfe6f2;font:15px/1.45 system-ui,Segoe UI,Roboto,sans-serif}
+header{padding:14px 16px 4px;position:relative}.lg{position:absolute;right:16px;top:14px;font-size:12px;color:#8fa0bd}.lg select{font-size:12px}
+h1{margin:0;font-size:22px;letter-spacing:.18em}
+h1 small{display:block;font-size:12px;letter-spacing:.04em;font-weight:400;color:#8fa0bd;margin-top:2px}
+main{max-width:1100px;margin:0 auto;padding:0 12px 40px}
+#stage{background:#000;position:relative;margin:10px 0}
+#cv{display:block;width:100%;height:auto;background:#000}
+#stage:fullscreen{display:flex;align-items:center;justify-content:center;background:#000}
+#stage:fullscreen #cv{width:100vw;height:100vh;object-fit:contain}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+button,select,label.btn{background:#16203a;color:#e8eefc;border:1px solid #2b3b66;border-radius:8px;padding:9px 13px;font:inherit;cursor:pointer}
+button:hover,label.btn:hover{background:#1e2c52}
+button.pri{background:#2858c9;border-color:#3d6ee0}
+button:disabled{opacity:.5}
+input[type=range]{accent-color:#4d8dff}
+#seek{flex:1;min-width:140px}
+fieldset{border:1px solid #223055;border-radius:10px;margin:10px 0;padding:8px 12px}
+legend{color:#8fa0bd;padding:0 6px;font-size:13px}
+#status{font-size:13px;color:#9fb3d9;min-height:1.4em;white-space:pre-wrap}
+.sc{display:grid;grid-template-columns:132px 1fr;gap:10px;border-top:1px solid #1b2542;padding:10px 0}
+.sc canvas{width:132px;height:74px;background:#111;border-radius:6px}
+.sc h3{margin:0 0 4px;font-size:14px}
+.sc h3 span{color:#7f93bd;font-weight:400;font-size:12px}
+.sc textarea{width:100%;min-height:64px;background:#0d1426;color:#dfe6f2;border:1px solid #223055;border-radius:6px;padding:6px;font:13px/1.4 inherit}
+.sc .b{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.sc .b button,.sc .b label{padding:5px 9px;font-size:12px}
+.note{font-size:12.5px;color:#8fa0bd}
+#stage.fs{position:fixed;inset:0;z-index:99;margin:0;display:flex;align-items:center;justify-content:center}
+#stage.fs #cv{width:100vw;height:100vh;object-fit:contain}
+#bX{position:absolute;top:8px;right:8px;z-index:100;display:none}
+#stage.fs #bX,#stage:fullscreen #bX{display:block}
+@media(max-width:560px){.sc{grid-template-columns:1fr}.sc canvas{width:100%;height:auto;aspect-ratio:16/9}}
+</style>
+</head>
+<body>
+<header>
+<label class="lg"><span data-i="lang">Limba</span> <select id="lang"><option value="ro">Română</option><option value="en">English</option><option value="fr">Français</option><option value="it">Italiano</option><option value="es">Español</option><option value="pt">Português</option><option value="de">Deutsch</option><option value="hu">Magyar</option></select></label>
+<h1>ODISEEA<small data-i="sub">Documentar Voyager 1 și 2 · imagini NASA/JPL · versiune 2D și 3D SBS pentru ochelari VR</small></h1>
+</header>
+<main>
+<div id="stage"><canvas id="cv" width="1920" height="1080"></canvas><button id="bX" data-i="bX">✕ Ieși</button></div>
+
+<div class="row">
+<button class="pri" id="bPlay" data-i="play">▶ Redă</button>
+<button id="bPause" data-i="pause">⏸ Pauză</button>
+<button id="bRestart">⏮</button>
+<input type="range" id="seek" min="0" max="1000" value="0">
+<span id="tl">0:00 / 0:00</span>
+</div>
+
+<fieldset><legend data-i="fmtLeg">Format</legend>
+<div class="row">
+<select id="mode">
+<option value="2d" data-i="m2d">2D normal · 1920×1080</option>
+<option value="phone" selected data-i="mphone">3D pe telefon în ochelari (ecran plin, proporții corecte)</option>
+<option value="half" data-i="mhalf">3D SBS jumătate · 1920×1080 (fișier comprimat lateral)</option>
+<option value="full" data-i="mfull">3D SBS complet · 3840×1080 (TV / monitor 3D)</option>
+</select>
+<label><span data-i="depth">Adâncime 3D</span> <input type="range" id="depth" min="-100" max="100" value="40"></label>
+<label><input type="checkbox" id="swap"> <span data-i="swap">Schimbă ochii (dacă adâncimea pare inversată)</span></label>
+<label><span data-i="fit">Cadru</span> <select id="fit"><option value="contain" data-i="fitC">întreg (cu benzi negre)</option><option value="full" data-i="fitF">umple ecranul (decupat)</option></select></label>
+<button id="bFs" data-i="bFs">⛶ Pe tot ecranul</button>
+</div>
+<div class="note" data-i="note1">Pentru Myria MY9801 / Omega 3DBOX, direct din aplicație: alege „3D pe telefon”, apasă „Pe tot ecranul”, pune telefonul în ochelari (peisaj). Fișierele SBS exportate sunt pentru playere/TV; în ochelari ele apar comprimate lateral dacă playerul nu le corectează. Dacă adâncimea pare „înăuntru” în loc de „în afară”, bifează „Schimbă ochii” sau inversează slider-ul.</div>
+</fieldset>
+
+<fieldset><legend data-i="sndLeg">Sunet</legend>
+<div class="row">
+<label><input type="checkbox" id="musicOn" checked> <span data-i="music">Muzică ambientală generată</span></label>
+<label><span data-i="vol">Volum</span> <input type="range" id="mvol" min="0" max="100" value="55"></label>
+<label><input type="checkbox" id="tts"> <span data-i="tts">Voce sintetică (doar la redare; nu se înregistrează)</span></label>
+</div>
+<div class="row">
+<label class="btn"><span data-i="fMusic">♪ Muzica ta (audio)</span><input type="file" id="fMusic" accept="audio/*" hidden></label>
+<label class="btn"><span data-i="fVoice">🎙 Narațiune înregistrată (audio)</span><input type="file" id="fVoice" accept="audio/*" hidden></label>
+<button id="bScript" data-i="bScript">Descarcă textul narațiunii (.txt)</button>
+</div>
+<div class="note" data-i="note2">Browserul nu poate înregistra vocea sintetică în fișierul video. Pentru voce în film: citește textul narațiunii, încarcă înregistrarea aici și exportă.</div>
+</fieldset>
+
+<fieldset><legend data-i="imgLeg">Imagini și export</legend>
+<div class="row">
+<button class="pri" id="bLoad" data-i="bLoad">⬇ Încarcă imaginile (NASA / Commons)</button>
+<button id="bExp" data-i="bExp">⏺ Exportă formatul ales</button>
+<button id="bCancel" hidden data-i="bCancel">✖ Anulează exportul</button>
+<label class="btn"><span data-i="fMany">📁 Imagini proprii (mai multe, în ordine)</span><input type="file" id="fMany" accept="image/*" multiple hidden></label>
+<div style="flex-basis:100%"></div>
+<label><input type="checkbox" id="fxOn" checked> <span data-i="fxOn">Texturi fractale hiper-detaliate (GPU) în scenele generate</span></label>
+<label><span data-i="fxq">Calitate</span> <select id="fxq"><option value="std" data-i="qStd">standard 2048×1152</option><option value="ultra" data-i="qUltra">ultra 3072×1728</option></select></label>
+<label><input type="checkbox" id="fxBg" checked> <span data-i="fxBg">Fundal stelar fractal în zonele negre ale pozelor reale (artistic)</span></label>
+<button id="bFx" data-i="bFx">↻ Regenerează texturile</button>
+<div style="flex-basis:100%"></div>
+<button id="bExpAll" data-i="bExpAll">⏺ Exportă toate (2D + SBS jumătate + SBS complet)</button>
+<button id="bCred" data-i="bCred">Descarcă creditele (.txt)</button>
+</div>
+<div class="note" data-i="note3">Exportul se face în timp real (≈ durata filmului). Ține fila în prim-plan și ecranul aprins: dacă fila e ascunsă, exportul se anulează singur. Formatul „complet” (3840×1080) cere un computer puternic. Rezultatul e MP4 dacă browserul permite, altfel WebM.</div>
+<div id="status"></div>
+</fieldset>
+
+<div id="list"></div>
+</main>
+
+<script type="text/plain" id="fxsrc">
+#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+uniform vec2 uRes;
+uniform float uPass,uSeed,uTrail,uN;
+uniform vec4 uS[6];
+uniform vec4 uRing;
+uniform vec4 uView;
+uniform vec2 uOff;
+float ssm(float a,float b,float x){float t=clamp((x-a)/(b-a),0.,1.);return t*t*(3.-2.*t);}
+#define smoothstep ssm
+
+vec3 rotX(vec3 v,float a){float c=cos(a),s=sin(a);return vec3(v.x,c*v.y-s*v.z,s*v.y+c*v.z);}
+vec3 rotY(vec3 v,float a){float c=cos(a),s=sin(a);return vec3(c*v.x+s*v.z,v.y,-s*v.x+c*v.z);}
+vec3 rotZ(vec3 v,float a){float c=cos(a),s=sin(a);return vec3(c*v.x-s*v.y,s*v.x+c*v.y,v.z);}
+
+float hash13(vec3 p3){p3=fract(p3*.1031);p3+=dot(p3,p3.zyx+31.32);return fract((p3.x+p3.y)*p3.z);}
+float vnoise(vec3 p){
+ vec3 i=floor(p),f=fract(p);f=f*f*f*(f*(f*6.-15.)+10.);
+ float a=hash13(i),b=hash13(i+vec3(1.,0.,0.)),c=hash13(i+vec3(0.,1.,0.)),d=hash13(i+vec3(1.,1.,0.));
+ float e=hash13(i+vec3(0.,0.,1.)),g=hash13(i+vec3(1.,0.,1.)),h=hash13(i+vec3(0.,1.,1.)),k=hash13(i+vec3(1.,1.,1.));
+ return mix(mix(mix(a,b,f.x),mix(c,d,f.x),f.y),mix(mix(e,g,f.x),mix(h,k,f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<7;i++){s+=a*vnoise(p);p=p*2.03+vec3(1.7,9.2,3.1);a*=.5;}return s;}
+float fbm5(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*vnoise(p);p=p*2.03+vec3(1.7,9.2,3.1);a*=.5;}return s;}
+float ridged(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){float n=1.-abs(vnoise(p)*2.-1.);s+=a*n*n;p=p*2.1+vec3(5.2,1.3,8.7);a*=.5;}return s;}
+float worley(vec3 p){
+ vec3 i=floor(p),f=fract(p);float m=8.;
+ for(int z=-1;z<=1;z++)for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){
+  vec3 g=vec3(float(x),float(y),float(z));vec3 o=vec3(hash13(i+g),hash13(i+g+17.1),hash13(i+g+41.7));
+  vec3 d=g+o-f;m=min(m,dot(d,d));}
+ return sqrt(m);}
+
+float starLayer(vec2 px,float cell,float seed,float dens,out vec3 tint){
+ vec2 g=px/cell,i=floor(g),f=fract(g);
+ float h=hash13(vec3(i,seed));
+ tint=vec3(1.);
+ if(h>dens) return 0.;
+ vec2 o=vec2(hash13(vec3(i,seed+1.3)),hash13(vec3(i,seed+2.7)))*.7+.15;
+ float d=length((f-o)*cell);
+ float m=hash13(vec3(i,seed+5.1));
+ float b=.25+.75*m*m;
+ float s=mix(.7,1.4,m);
+ float v=b*exp(-d*d/(2.*s*s));
+ v+=step(.9,m)*b*.35*exp(-d/5.);
+ float t=hash13(vec3(i,seed+9.9));
+ tint=mix(mix(vec3(1.,.72,.5),vec3(.65,.78,1.),t),vec3(1.),.4);
+ return v;}
+
+vec3 nebulaCol(vec2 uv){
+ vec3 sd=vec3(uSeed*1.7,uSeed*.6,uSeed*2.3);
+ vec2 q=vec2(fbm(vec3(uv*.9,0.)+sd),fbm(vec3(uv*.9+4.,0.)+sd+3.));
+ float n=fbm(vec3(uv*1.5+q*2.2,1.)+sd);
+ float m=fbm(vec3(uv*3.2-q*1.4,2.)+sd);
+ float f=fbm5(vec3(uv*7.5+q*2.5,3.)+sd);
+ float bd=uv.y*.9+uv.x*.35+.15*sin(uv.x*1.3+uSeed);
+ float band=exp(-bd*bd*1.4);
+ vec3 pa=mix(vec3(.5),.5+.5*cos(6.2831*(uSeed*.11+vec3(.0,.33,.67))),.7);
+ vec3 pb=mix(vec3(.5),.5+.5*cos(6.2831*(uSeed*.11+.5+vec3(.0,.33,.67))),.7);
+ float fil=ridged(vec3(uv*2.2+q*1.8,7.)+sd);
+ vec3 c=vec3(.003,.004,.01);
+ c+=pa*pow(smoothstep(.38,.9,n),2.2)*.17*(.15+band);
+ c+=pb*pow(smoothstep(.5,.92,m),2.6)*.14*(.12+band);
+ c+=mix(pa,pb,.5)*pow(fil,3.2)*.16*(.1+band);
+ c+=vec3(1.,.9,.8)*pow(f,3.)*.05*band;
+ float dust=smoothstep(.5,.72,fbm5(vec3(uv*2.6+q,5.)+sd));
+ c*=1.-.75*dust*band;
+ return c;}
+
+vec3 background(vec2 pxn,vec2 uv){
+ vec3 c=nebulaCol(uv);vec3 t;float v;
+ float bd=uv.y*.9+uv.x*.35+.15*sin(uv.x*1.3+uSeed);float band=exp(-bd*bd*1.4);
+ v=starLayer(pxn+13.,9.,uSeed+11.,.5,t);c+=t*v*.22*(.35+1.3*band);
+ v=starLayer(pxn,22.,uSeed,.2,t);c+=t*v*.85;
+ v=starLayer(pxn+101.,47.,uSeed+3.,.3,t);c+=t*v*1.1;
+ v=starLayer(pxn+57.,97.,uSeed+7.,.4,t);c+=t*v*1.6;
+ return c;}
+
+/* ====================== MODE 0: sfere (planete, luni, inele, traiectorii) ====================== */
+#ifdef M0
+float craters(vec3 p){float c=0.;for(int k=0;k<3;k++){float w=worley(p*(5.+7.*float(k))+float(k)*9.);c+=(-smoothstep(.28,.0,w)+.55*smoothstep(.26,.34,w)*smoothstep(.45,.34,w))/(1.+float(k));}return c;}
+vec3 surfJup(vec3 p){
+ float lat=p.y;vec3 q=vec3(p.x*1.3,lat*6.5,p.z*1.3);
+ vec3 w=vec3(fbm5(q*1.6+vec3(3.,1.,2.)),fbm5(q*1.6+vec3(7.,5.,9.)),0.);
+ float band=.5+.5*sin(lat*17.+w.x*6.+fbm5(q*.7)*3.);
+ float fine=fbm(vec3(p.x*7.,lat*46.,p.z*7.)+w*3.5);
+ float cells=fbm(p*vec3(15.,28.,15.)+w*2.4);
+ vec3 c=mix(vec3(.94,.86,.72),vec3(.63,.39,.25),smoothstep(.25,.85,band));
+ c=mix(c,vec3(.98,.95,.9),smoothstep(.55,.92,cells)*.55*(1.-band*.6));
+ c=mix(c,vec3(.42,.25,.17),smoothstep(.6,.9,fbm5(vec3(p.x*3.,lat*30.,p.z*3.)+w*2.))*.45*band);
+ c*=.74+.55*fine;
+ vec3 g=normalize(vec3(.55,-.33,.77));vec3 d=p-g;vec3 ax=normalize(vec3(g.z,0.,-g.x));
+ float dx=dot(d,ax),dy=d.y;
+ float swirl=fbm5(vec3(dx*20.,dy*44.,0.)+w*4.+vec3(1.,3.,2.));
+ float sp=exp(-(dx*dx/.028+dy*dy/.0075));
+ c=mix(c,mix(vec3(.74,.27,.14),vec3(.92,.58,.4),swirl),sp*.9);
+ c=mix(c,vec3(.97,.93,.88),exp(-(dx*dx/.05+(dy+.11)*(dy+.11)/.0007))*.35*(1.-sp));
+ return c;}
+vec3 surfSat(vec3 p){
+ float lat=p.y;vec3 q=vec3(p.x*1.2,lat*6.,p.z*1.2);
+ vec3 w=vec3(fbm5(q*1.4+2.),fbm5(q*1.4+8.),0.);
+ float band=.5+.5*sin(lat*20.+w.x*3.5);
+ vec3 c=mix(vec3(.93,.83,.6),vec3(.78,.64,.42),band);
+ c=mix(c,vec3(.97,.9,.72),smoothstep(.5,.9,fbm5(p*vec3(9.,30.,9.)+w*2.))*.4);
+ c*=.9+.25*fbm(vec3(p.x*6.,lat*50.,p.z*6.)+w*2.);
+ c=mix(c,vec3(.5,.56,.64),smoothstep(.8,.97,abs(lat))*.35);
+ return c;}
+vec3 surfTitan(vec3 p){
+ float lat=p.y;
+ vec3 c=mix(vec3(.88,.58,.22),vec3(.78,.46,.15),smoothstep(-.3,.9,lat));
+ c*=.92+.14*fbm5(vec3(p.x*3.,lat*8.,p.z*3.)+4.);
+ c=mix(c,vec3(.33,.24,.17),smoothstep(.6,.72,lat)*smoothstep(.97,.8,lat)*.55);
+ return c;}
+vec3 surfUra(vec3 p){
+ float lat=p.y;
+ vec3 c=mix(vec3(.55,.83,.88),vec3(.7,.92,.93),smoothstep(.3,1.,abs(lat)));
+ c+=.025*sin(lat*26.+fbm5(p*3.)*4.);
+ c*=.97+.08*fbm5(vec3(p.x*4.,lat*20.,p.z*4.));
+ return c;}
+vec3 surfNep(vec3 p){
+ float lat=p.y;vec3 q=vec3(p.x*1.4,lat*6.,p.z*1.4);
+ vec3 w=vec3(fbm5(q*1.5+5.),fbm5(q*1.5+1.),0.);
+ float band=.5+.5*sin(lat*15.+w.x*4.);
+ vec3 c=mix(vec3(.14,.3,.86),vec3(.07,.16,.66),band);
+ c*=.9+.25*fbm5(vec3(p.x*5.,lat*26.,p.z*5.)+w*2.);
+ vec3 g=normalize(vec3(-.35,.3,.88));vec3 d=p-g;vec3 ax=normalize(vec3(g.z,0.,-g.x));
+ float dx=dot(d,ax),dy=d.y;
+ c=mix(c,vec3(.03,.06,.3),exp(-(dx*dx/.03+dy*dy/.012))*.85);
+ float cir=ridged(vec3(p.x*3.,lat*16.,p.z*3.)+w*3.);
+ float streak=smoothstep(.78,.95,cir)*(smoothstep(.0,.2,dx+.35)*exp(-dy*dy/.05)*.8+.15*band);
+ return mix(c,vec3(.92,.96,1.),clamp(streak,0.,1.)*.8);}
+vec3 surfIo(vec3 p){
+ float a=fbm(p*3.5),b=fbm(p*9.+3.),c=ridged(p*5.+1.);
+ vec3 col=mix(vec3(.95,.85,.35),vec3(.9,.55,.2),smoothstep(.4,.7,a));
+ col=mix(col,vec3(.97,.97,.88),smoothstep(.55,.75,b)*.7);
+ col=mix(col,vec3(.55,.45,.2),smoothstep(.62,.75,fbm5(p*14.))*.5);
+ col=mix(col,vec3(.05,.04,.03),smoothstep(.72,.78,fbm5(p*6.+9.)));
+ col=mix(col,vec3(.8,.2,.08),smoothstep(.8,.9,c)*.45);
+ return col*(.88+.2*fbm5(p*40.));}
+vec3 surfEur(vec3 p){
+ float a=fbm(p*4.);vec3 col=mix(vec3(.88,.86,.8),vec3(.95,.95,.97),a);
+ float l=pow(ridged(p*5.+fbm5(p*3.)*1.5),3.5);col=mix(col,vec3(.55,.33,.2),clamp(l*1.8,0.,1.)*.8);
+ float l2=ridged(p*9.+4.);col=mix(col,vec3(.4,.25,.15),smoothstep(.75,.95,l2)*.5);
+ return col*(.85+.3*fbm5(p*30.));}
+vec3 surfIce(vec3 p){
+ float a=fbm(p*3.);float cr=craters(p);
+ vec3 col=mix(vec3(.62,.62,.66),vec3(.82,.82,.85),a);
+ col=mix(col,vec3(.5,.45,.45),smoothstep(.5,.8,ridged(p*6.))*.4);
+ return col*(.9+.35*cr)*(.9+.2*fbm5(p*28.));}
+vec3 surfEarth(vec3 p){
+ float c=fbm(p*3.),d=fbm(p*8.+2.);
+ vec3 land=mix(vec3(.18,.32,.1),vec3(.45,.38,.22),d);
+ vec3 s=mix(vec3(.03,.1,.34),land,smoothstep(.5,.54,c));
+ s=mix(s,vec3(.96),smoothstep(.5,.8,fbm(p*4.+7.))*.85);
+ return mix(s,vec3(.95),smoothstep(.85,.95,abs(p.y)));}
+float hgt(float ty,vec3 p){
+ if(ty<5.5) return fbm5(p*16.)*.6+ridged(p*9.)*.4;
+ if(ty<6.5) return pow(ridged(p*6.+fbm5(p*3.)),3.)*.9+fbm5(p*30.)*.15;
+ return fbm5(p*12.)*.5-craters(p)*.5;}
+vec3 shadeSphere(float ty,vec3 nv,vec3 L,float seed){
+ if(ty>7.5&&ty<8.5){vec3 ps=rotY(nv,seed);float g=fbm(ps*9.),g2=fbm(ps*30.);return mix(vec3(1.,.5,.12),vec3(1.,.93,.65),smoothstep(.3,.8,g))*(2.6+.5*g2)*(.75+.4*nv.z);}
+ float ang=seed*.9;vec3 p=rotY(nv,ang);
+ vec3 alb=vec3(.5);float wrap=.1,limb=.3,bump=0.,sp=0.;vec3 atm=vec3(0.);
+ if(ty<.5){alb=surfJup(p);wrap=.2;limb=.6;atm=vec3(.95,.7,.45)*.3;}
+ else if(ty<1.5){alb=surfSat(p);wrap=.2;limb=.55;atm=vec3(.95,.85,.6)*.25;}
+ else if(ty<2.5){alb=surfTitan(p);wrap=.45;limb=.4;atm=vec3(.95,.6,.25)*.6;}
+ else if(ty<3.5){alb=surfUra(p);wrap=.3;limb=.5;atm=vec3(.6,.9,.95)*.35;}
+ else if(ty<4.5){alb=surfNep(p);wrap=.25;limb=.55;atm=vec3(.25,.45,1.)*.45;}
+ else if(ty<5.5){alb=surfIo(p);bump=.02;sp=.1;}
+ else if(ty<6.5){alb=surfEur(p);bump=.015;sp=.25;}
+ else if(ty<7.5){alb=surfIce(p);bump=.03;sp=.12;}
+ else {alb=surfEarth(p);wrap=.15;limb=.4;atm=vec3(.35,.6,1.)*.6;sp=.2;}
+ vec3 n=nv;
+ if(bump>0.){float e=.0025;float h0=hgt(ty,p);vec3 g=vec3(hgt(ty,p+vec3(e,0.,0.))-h0,hgt(ty,p+vec3(0.,e,0.))-h0,hgt(ty,p+vec3(0.,0.,e))-h0)/e;vec3 pn=normalize(p-bump*(g-dot(g,p)*p));n=rotY(pn,-ang);}
+ float lit=pow(clamp((dot(n,L)+wrap)/(1.+wrap),0.,1.),.9);
+ float ld=mix(1.,pow(max(nv.z,0.),.55),limb);
+ vec3 col=alb*lit*ld*2.2+alb*.01;
+ col+=atm*pow(1.-max(nv.z,0.),3.)*lit*1.4;
+ vec3 hh=normalize(L+vec3(0.,0.,1.));
+ col+=sp*pow(max(dot(n,hh),0.),50.)*lit;
+ return col;}
+vec3 haloCol(float ty,vec2 dir,float rho,vec3 L){
+ float k=.1,ex=14.;vec3 c=vec3(.6,.7,1.);
+ if(ty<.5){c=vec3(.95,.7,.45);k=.22;}
+ else if(ty<1.5){c=vec3(.95,.85,.6);k=.18;}
+ else if(ty<2.5){c=vec3(.95,.6,.25);k=.85;ex=10.;}
+ else if(ty<3.5){c=vec3(.6,.9,.95);k=.3;}
+ else if(ty<4.5){c=vec3(.25,.45,1.);k=.4;}
+ else if(ty>7.5&&ty<8.5){c=vec3(1.,.8,.5);k=1.8;ex=3.5;}
+ else if(ty>8.5){c=vec3(.5,.75,1.);k=.3;}
+ float lit=clamp(dot(dir,L.xy)*.7+.5,0.,1.);
+ if(ty>7.5&&ty<8.5) lit=1.;
+ return c*k*exp(-(rho-1.)*ex)*lit;}
+float ringDen(float rho,float detail){
+ float x=(rho-uRing.x)/(uRing.y-uRing.x);
+ if(x<0.||x>1.) return 0.;
+ float prof=.28*smoothstep(0.,.03,x)*(1.-smoothstep(.15,.2,x))+smoothstep(.17,.22,x)*(1.-smoothstep(.53,.56,x))+.72*smoothstep(.6,.63,x)*(1.-smoothstep(.86,.88,x))+.62*smoothstep(.9,.92,x)*(1.-smoothstep(.96,.985,x));
+ if(detail>.5){float a=fbm5(vec3(rho*140.,uSeed,1.)),b=fbm5(vec3(rho*520.,2.,uSeed));prof*=.45+.9*a*(.6+.8*b);}
+ return clamp(prof,0.,1.);}
+void modeSpheres(vec2 P,vec2 pxn,out vec3 col,out float depth){
+ vec3 L=normalize(rotZ(vec3(-.55,.42,.68),uView.w));
+ col=vec3(0.);depth=.08;
+ if(uPass<.5) col=background(pxn,P);
+ if(uTrail>.5&&uPass<.5){
+  for(int i=0;i<5;i++){
+   if(float(i+1)>=uN) break;
+   vec2 a=uS[i].xy,b=uS[i+1].xy,ab=b-a;float hh=clamp(dot(P-a,ab)/dot(ab,ab),0.,1.);
+   vec2 pp=normalize(vec2(-ab.y,ab.x));float ev=mod(float(i),2.);
+   float bump=sin(hh*3.14159)*(ev<.5?.22:-.18);
+   float d=length(P-(a+ab*hh+pp*bump));
+   float dash=.55+.45*step(.5,fract(hh*16.+float(i)*.37));
+   vec3 lc=ev<.5?vec3(.3,.75,1.):vec3(1.,.7,.3);
+   col+=lc*dash*(exp(-d*d*3200.)*.9+exp(-d*d*220.)*.08);
+  }}
+ vec3 halo=vec3(0.);
+ for(int i=0;i<6;i++){
+  if(float(i)>=uN) break;
+  vec4 s=uS[i];vec2 d=P-s.xy;float r=s.z,rho=length(d)/r,base=.36+.1*float(i);
+  bool inside=rho<1.;float zs=0.;
+  if(inside){
+   zs=sqrt(max(0.,1.-rho*rho));depth=base+.2*zs;
+   if(uPass<.5){
+    vec3 nv=vec3(d/r,zs);float sh=1.;
+    if(s.w>.5&&s.w<1.5){vec3 Nr=normalize(vec3(uRing.z,.86,uRing.w));float dn=dot(L,Nr);if(abs(dn)>.001){float t=-dot(nv,Nr)/dn;if(t>0.){vec3 h=nv+L*t;sh=1.-.85*ringDen(length(h),0.);}}}
+    col=shadeSphere(s.w,nv,L,uSeed+float(i)*1.7)*sh;
+   }}
+  if(uPass<.5&&!inside&&(rho<1.4||(s.w>7.5&&s.w<8.5&&rho<9.))) halo+=haloCol(s.w,normalize(d),rho,L);
+  if(s.w>.5&&s.w<1.5){
+   vec3 Nr=normalize(vec3(uRing.z,.86,uRing.w));vec2 q=d/r;float hz=-(Nr.x*q.x+Nr.y*q.y)/Nr.z;
+   float rr=length(vec3(q,hz));
+   if(rr>uRing.x&&rr<uRing.y&&(!inside||hz>zs)){
+    float dn=ringDen(rr,uPass<.5?1.:0.);
+    if(dn>.003){
+     depth=mix(depth,base+.12+.1*clamp(hz,-1.,1.),clamp(dn*3.,0.,1.));
+     if(uPass<.5){
+      vec3 hp=vec3(q,hz);float b=dot(hp,L),c=dot(hp,hp)-1.,disc=b*b-c;float lit=1.;
+      if(disc>0.&&(-b+sqrt(disc))>0.) lit=.07;
+      vec3 rc=mix(vec3(.9,.8,.62),vec3(.66,.52,.36),fbm5(vec3(rr*90.,3.,uSeed)));
+      rc*=.7+.5*fbm5(vec3(rr*300.,5.,1.));
+      rc*=(.35+.65*abs(dot(Nr,L)))*lit*2.0+.01;
+      col=mix(col,rc,clamp(dn*.95,0.,1.));
+     }}}}
+ }
+ col+=halo;
+}
+#endif
+
+/* ====================== MODE 1/2/3: raymarching (sonda, racheta, antena DSN) ====================== */
+#if defined(M1)||defined(M2)||defined(M3)
+float sdCyl(vec3 p,float r,float h){vec2 d=abs(vec2(length(p.xy),p.z))-vec2(r,h);return min(max(d.x,d.y),0.)+length(max(d,0.));}
+float sdCylY(vec3 p,float r,float h){return sdCyl(vec3(p.x,p.z,p.y),r,h);}
+float sdCap(vec3 p,vec3 a,vec3 b,float r){vec3 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h)-r;}
+float sdBox(vec3 p,vec3 b){vec3 q=abs(p)-b;return length(max(q,0.))+min(max(q.x,max(q.y,q.z)),0.);}
+vec2 opU(vec2 a,vec2 b){return a.x<b.x?a:b;}
+#endif
+
+#ifdef M1
+vec2 mapScene(vec3 p){
+ float dish=max(abs(length(p-vec3(0.,0.,2.8))-2.8)-.014,max(length(p.xy)-1.85,p.z-1.4));
+ dish=min(dish,length(vec2(length(p.xy)-1.85,p.z-.7))-.03);
+ vec2 r=vec2(dish,1.);
+ float st=1e5;
+ for(int i=0;i<4;i++){float a=float(i)*1.5708+.7854;st=min(st,sdCap(p,vec3(cos(a)*1.8,sin(a)*1.8,.69),vec3(0.,0.,1.6),.013));}
+ st=min(st,sdCyl(p-vec3(0.,0.,1.65),.19,.03));
+ r=opU(r,vec2(st,3.));
+ r=opU(r,vec2(sdCyl(p-vec3(0.,0.,-.42),.66,.3)-.015,2.));
+ vec3 a0=vec3(-.6,0.,-.5),a1=vec3(-3.2,.5,-.95);vec3 dr=normalize(a1-a0);
+ r=opU(r,vec2(sdCap(p,a0,a1,.03),3.));
+ float rt=1e5;
+ for(int i=0;i<3;i++){vec3 c=a0+(a1-a0)*(.42+.17*float(i));rt=min(rt,sdCap(p,c-dr*.26,c+dr*.26,.1));}
+ r=opU(r,vec2(rt,5.));
+ r=opU(r,vec2(sdCap(p,vec3(.65,0.,-.45),vec3(3.0,-.55,-.3),.028),3.));
+ r=opU(r,vec2(sdBox(p-vec3(3.1,-.58,-.3),vec3(.17,.12,.1))-.01,3.));
+ r=opU(r,vec2(sdCyl(p-vec3(3.1,-.58,-.17),.045,.08),4.));
+ r=opU(r,vec2(sdCap(p,vec3(0.,.6,-.4),vec3(-.5,3.9,-1.1),.012),3.));
+ r=opU(r,vec2(sdCap(p,vec3(.1,-.6,-.5),vec3(1.9,-3.3,-1.2),.01),3.));
+ vec3 q=p-vec3(0.,-.69,-.48);
+ r=opU(r,vec2(sdCyl(vec3(q.x,q.z,q.y),.3,.012),4.));
+ return r;}
+#endif
+
+#ifdef M2
+vec2 mapScene(vec3 p){
+ vec2 r=vec2(sdCylY(p-vec3(0.,-.4,0.),.27,1.6),1.);
+ r=opU(r,vec2(sdCylY(p-vec3(0.,1.65,0.),.27,.45),6.));
+ r=opU(r,vec2(min(sdCap(p,vec3(0.,2.1,0.),vec3(0.,2.65,0.),.27),sdCap(p,vec3(0.,2.65,0.),vec3(0.,3.05,0.),.1)),6.));
+ for(int i=0;i<2;i++){
+  float sx=i==0?-.5:.5;
+  r=opU(r,vec2(sdCylY(p-vec3(sx,-.35,0.),.21,1.65),1.));
+  r=opU(r,vec2(sdCap(p,vec3(sx,1.3,0.),vec3(sx,1.75,0.),.2),1.));
+  r=opU(r,vec2(sdCylY(p-vec3(sx,-2.1,0.),.13,.1),3.));
+ }
+ r=opU(r,vec2(sdCylY(p-vec3(0.,-2.1,0.),.15,.1),3.));
+ return r;}
+#endif
+
+#ifdef M3
+vec2 mapScene(vec3 p){
+ float g=p.y+1.55+.12*sin(p.x*.7)*sin(p.z*.6)+.05*sin(p.x*2.3+p.z*1.7);
+ vec2 r=vec2(g*.6,7.);
+ r=opU(r,vec2(sdCylY(p-vec3(0.,-.9,0.),.38,.7),8.));
+ vec3 q=rotX(p-vec3(0.,.3,0.),.95);
+ float dish=max(abs(length(q-vec3(0.,0.,4.66))-4.66)-.02,max(length(q.xy)-2.1,q.z-1.0));
+ dish=min(dish,length(vec2(length(q.xy)-2.1,q.z-.5))-.045);
+ r=opU(r,vec2(dish,1.));
+ float tr=1e5;
+ for(int i=0;i<8;i++){float a=float(i)*.7854;tr=min(tr,sdCap(q,vec3(0.,0.,-.3),vec3(cos(a)*2.0,sin(a)*2.0,.28),.022));}
+ tr=min(tr,length(vec2(length(q.xy)-1.2,q.z-.05))-.03);
+ tr=min(tr,length(vec2(length(q.xy)-.7,q.z+.12))-.03);
+ for(int i=0;i<4;i++){float a=float(i)*1.5708+.7854;tr=min(tr,sdCap(q,vec3(cos(a)*1.95,sin(a)*1.95,.5),vec3(0.,0.,2.3),.017));}
+ tr=min(tr,sdCyl(q-vec3(0.,0.,-.25),.3,.3));
+ tr=min(tr,sdCyl(q-vec3(0.,0.,2.35),.12,.13));
+ r=opU(r,vec2(tr,9.));
+ return r;}
+#endif
+
+#if defined(M1)||defined(M2)||defined(M3)
+vec3 calcN(vec3 p){vec2 e=vec2(.0012,0.);return normalize(vec3(mapScene(p+e.xyy).x-mapScene(p-e.xyy).x,mapScene(p+e.yxy).x-mapScene(p-e.yxy).x,mapScene(p+e.yyx).x-mapScene(p-e.yyx).x));}
+float softShadow(vec3 ro,vec3 rd){float res=1.,t=.03;for(int i=0;i<22;i++){float h=mapScene(ro+rd*t).x;res=min(res,8.*h/t);t+=clamp(h,.03,.5);if(res<.01||t>7.)break;}return clamp(res,0.,1.);}
+float calcAO(vec3 p,vec3 n){float o=0.,s=1.;for(int i=0;i<4;i++){float h=.03+.13*float(i);float d=mapScene(p+n*h).x;o+=(h-d)*s;s*=.7;}return clamp(1.-1.6*o,0.,1.);}
+vec3 envMap(vec3 r,vec3 L){
+ float s=pow(max(dot(r,L),0.),24.);
+ return mix(vec3(.01,.015,.03),vec3(.06,.08,.14),r.y*.5+.5)+vec3(1.,.85,.6)*s*2.5+vec3(.2,.3,.6)*pow(max(dot(r,normalize(vec3(.6,-.2,-.5))),0.),6.)*.15;}
+void modeMarch(vec2 P,vec2 pxn,out vec3 col,out float depth){
+ col=vec3(0.);depth=.08;
+ if(uPass<.5) col=background(pxn,P);
+ vec2 Q=(P-uOff)*uView.z;
+ vec3 ro=vec3(0.,0.,10.),rd=normalize(vec3(Q,-3.2));
+#ifdef M3
+ ro=vec3(0.,.35,9.);
+#endif
+ float ax=uView.x,ay=uView.y;
+ vec3 roO=rotY(rotX(ro,-ax),-ay),rdO=rotY(rotX(rd,-ax),-ay);
+ vec3 Lw=normalize(rotY(vec3(-.55,.55,.7),uView.w));vec3 Lo=rotY(rotX(Lw,-ax),-ay);
+#ifdef M3
+ Lw=normalize(vec3(-.45,.7,.5));Lo=rotY(Lw,-ay);
+#endif
+ float t0=0.,t1=140.;bool inb=true;
+#if defined(M1)||defined(M2)
+ vec3 bc=vec3(0.);float br=4.7;
+#ifdef M2
+ bc=vec3(0.,.4,0.);br=3.7;
+#endif
+ vec3 oc=roO-bc;float bb=dot(oc,rdO),cc=dot(oc,oc)-br*br,dd=bb*bb-cc;
+ inb=dd>0.;
+ if(inb){t0=max(0.,-bb-sqrt(dd));t1=-bb+sqrt(dd);}
+#endif
+ float t=t0,mat=0.;bool hit=false;
+ if(inb){for(int i=0;i<84;i++){vec3 pp=roO+rdO*t;vec2 h=mapScene(pp);if(h.x<.0007*t+.0003){hit=true;mat=h.y;break;}t+=h.x*.92;if(t>t1)break;}}
+#ifdef M3
+ if(!hit&&rdO.y<.02){hit=true;t=t1;mat=7.;}
+#endif
+ float thit=hit?t:t1;
+ if(hit){
+  depth=clamp(.5+(10.-t)*.09,.05,.98);
+  if(uPass<.5){
+   vec3 pO=roO+rdO*t;vec3 nO=calcN(pO);
+#ifdef M3
+   if(t>=t1-.01){nO=vec3(0.,1.,0.);}
+#endif
+   vec3 alb=vec3(.5);float metal=0.,rough=.5;
+   if(mat<1.5){
+#ifdef M2
+    float yb=pO.y;float stripe=smoothstep(.02,0.,abs(fract(yb*1.1)-.5)-.45);
+    alb=mix(vec3(.9,.9,.88),vec3(.9,.38,.1),smoothstep(.02,.0,abs(yb-.7)-.12));
+    alb=mix(alb,vec3(.06),smoothstep(.03,0.,abs(yb+.9)-.05));
+#else
+    float ang=atan(pO.y,pO.x),rad=length(pO.xy);
+    float rib=smoothstep(.9,1.,abs(sin(ang*8.)))*smoothstep(.2,.4,rad);
+    float ring=smoothstep(.94,1.,abs(sin(rad*14.)));
+    alb=vec3(.86,.87,.88)*(1.-.18*rib-.1*ring)*(.92+.1*fbm5(pO*30.));
+#endif
+    metal=.05;rough=.5;
+   }else if(mat<2.5){
+    alb=vec3(.95,.72,.27)*(.55+.9*fbm(pO*16.));
+    nO=normalize(nO+.35*(vec3(fbm5(pO*20.),fbm5(pO*20.+3.),fbm5(pO*20.+6.))-.5));metal=.85;rough=.35;
+   }else if(mat<3.5){alb=vec3(.16,.16,.17)*(.8+.4*fbm5(pO*25.));metal=.5;rough=.45;}
+   else if(mat<4.5){alb=vec3(.98,.78,.3)*(.8+.3*sin(length(pO.xz)*260.));metal=.95;rough=.2;}
+   else if(mat<5.5){float fins=smoothstep(.3,.7,abs(sin(pO.x*60.+pO.y*60.)));alb=vec3(.2,.2,.22)*(.8+.4*fins);metal=.4;rough=.4;}
+   else if(mat<6.5){alb=vec3(.75,.77,.8)*(.9+.2*fbm5(pO*25.));metal=.5;rough=.35;}
+   else if(mat<7.5){alb=vec3(.1,.075,.055)*(.5+1.3*fbm(pO*vec3(2.,.0,2.)+3.));metal=0.;rough=.9;}
+   else if(mat<8.5){alb=vec3(.55,.54,.52)*(.8+.3*fbm5(pO*12.));metal=0.;rough=.8;}
+   else {alb=vec3(.7,.72,.75)*(.9+.2*fbm5(pO*20.));metal=.4;rough=.4;}
+   float sh=softShadow(pO+nO*.02,Lo),ao=calcAO(pO,nO);
+   vec3 V=-rdO;float dif=max(dot(nO,Lo),0.)*sh;
+   vec3 H=normalize(Lo+V);float spec=pow(max(dot(nO,H),0.),mix(8.,140.,1.-rough))*sh;
+   vec3 refl=envMap(reflect(rdO,nO),Lo);
+   float fres=pow(1.-max(dot(nO,V),0.),4.);
+   vec3 amb=vec3(.02,.03,.06)+vec3(.06,.08,.14)*(nO.y*.5+.5);
+   vec3 sunc=vec3(1.35,1.22,1.05);
+#ifdef M3
+   sunc=vec3(.55,.65,1.1);amb=vec3(.03,.04,.07)+vec3(.05,.07,.12)*(nO.y*.5+.5);
+#endif
+   vec3 c=alb*(dif*sunc+amb*ao*2.);
+   c=mix(c,alb*refl*1.2+spec*alb*2.,metal);
+   c+=spec*(1.-metal)*.15+fres*refl*.12;
+   float rim=pow(1.-max(dot(nO,V),0.),3.)*max(dot(nO,rotY(rotX(normalize(vec3(.6,.1,-.7)),-ax),-ay)),0.)*.35;
+   c+=rim*vec3(.4,.6,1.);
+#ifdef M3
+   float fog=smoothstep(8.,40.,t);c=mix(c,vec3(.02,.03,.06),fog);
+#endif
+   col=c;
+  }
+ }
+#ifdef M2
+ if(uPass<.5){
+  float T=1.;vec3 acc=vec3(0.);
+  for(int j=0;j<30;j++){
+   float tt=6.2+float(j)*.253;if(tt>thit) break;float wf=smoothstep(6.2,8.2,tt)*smoothstep(13.8,11.6,tt);
+   vec3 pp=roO+rdO*tt;
+   float dy=-2.1-pp.y;
+   float turb=fbm5(pp*vec3(3.,1.2,3.)+vec3(0.,uSeed*3.,0.));
+   float dens=0.;
+   if(dy>-.1){
+    float rad=.2+.2*max(dy,0.);
+    float dist=min(length(pp.xz-vec2(-.5,0.)),min(length(pp.xz),length(pp.xz-vec2(.5,0.))));
+    dens=smoothstep(rad,0.,dist)*exp(-max(dy,0.)*.55)*(.55+.9*turb)*3.;
+   }
+   float cl=smoothstep(.42,.75,fbm5(pp*1.5+vec3(0.,uSeed,0.)))*smoothstep(3.6,.6,length(pp.xz))*smoothstep(-3.8,-2.7,pp.y)*smoothstep(-1.6,-2.8,pp.y);
+   float glow=exp(-length(pp.xz)*.5)*exp(-max(dy,0.)*.25)*step(-3.5,pp.y);
+   vec3 e=dens*mix(vec3(1.,.32,.05),vec3(1.,.92,.65),clamp(dens*.5,0.,1.))*2.2;
+   vec3 sm=cl*(vec3(.5,.47,.45)*.35+vec3(1.,.5,.15)*glow*.9);
+   float sg=(dens*.8+cl*1.6)*wf;
+   acc+=T*(e+sm)*wf*.253;T*=exp(-sg*.253);
+  }
+  col=col*T+acc;
+ }
+#endif
+ if(!hit&&uPass>.5){
+#ifdef M3
+  depth=.04;
+#endif
+ }
+}
+#endif
+
+/* ====================== MODE 4: discul de aur ====================== */
+#ifdef M4
+void modeRecord(vec2 P,vec2 pxn,out vec3 col,out float depth){
+ col=vec3(0.);depth=.08;
+ if(uPass<.5) col=background(pxn,P);
+ vec2 Q=(P-uOff)*uView.z;
+ vec3 ro=vec3(0.,0.,8.),rd=normalize(vec3(Q,-3.));
+ vec3 n=rotX(rotY(vec3(0.,0.,1.),uView.y),uView.x);
+ float dn=dot(rd,n);if(abs(dn)<1e-4) return;
+ float t=-dot(ro,n)/dn;if(t<0.) return;
+ vec3 h=ro+rd*t;
+ vec3 ex=rotX(rotY(vec3(1.,0.,0.),uView.y),uView.x),ey=rotX(rotY(vec3(0.,1.,0.),uView.y),uView.x);
+ float u=dot(h,ex),v=dot(h,ey);float rad=length(vec2(u,v))/2.;float ang=atan(v,u);
+ if(rad>1.012||rad<.045) return;
+ depth=.5+.22*h.z;
+ if(uPass>.5) return;
+ vec3 Lw=normalize(rotY(vec3(-.55,.55,.7),uView.w));
+ vec3 V=-rd;vec3 hh=normalize(Lw+V);
+ vec3 T=normalize(-v*ex+u*ey);
+ float sp=rad*160.+ang*.159;
+ float gr=.5+.5*cos(6.2832*sp);
+ float amp=.45+.55*smoothstep(.4,.6,fbm5(vec3(rad*30.,0.,uSeed)));
+ float zone=smoothstep(.25,.27,rad);
+ vec3 gold=vec3(.96,.74,.28);
+ vec3 irid=.5+.5*cos(6.2832*(rad*2.2+vec3(0.,.33,.67)+ang*.08));
+ float aniso=exp(-pow(dot(hh,T),2.)*9.)*pow(max(dot(n,hh),0.),2.);
+ vec3 c=gold*(.5+.5*gr*amp*zone)*(.55+.5*max(dot(n,Lw),0.)+.2);
+ c+=irid*.22*aniso*zone*(.4+.6*gr);
+ c+=gold*aniso*(.45+.8*gr*zone)*1.3;
+ float lab=1.-zone;
+ float eng=smoothstep(.55,.6,abs(sin(ang*9.)*sin(rad*70.)));
+ c=mix(c,c*.45,lab*eng);
+ c*=1.+.06*fbm5(vec3(u*30.,v*30.,uSeed));
+ float edge=smoothstep(.985,1.,rad);
+ c=mix(c,vec3(1.,.88,.55)*(.8+aniso),edge);
+ c*=smoothstep(.045,.06,rad)*smoothstep(1.012,1.0,rad);
+ col=c*1.1;
+}
+#endif
+
+/* ====================== MODE 5: placa de pe coperta discului ====================== */
+#ifdef M5
+float segD(vec2 p,vec2 a,vec2 b,out float s){vec2 pa=p-a,ba=b-a;float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);s=h*length(ba);return length(pa-ba*h);}
+void modePlate(vec2 P,vec2 pxn,out vec3 col,out float depth){
+ col=vec3(0.);depth=.08;
+ if(uPass<.5) col=background(pxn,P);
+ vec2 Q=(P-uOff)*uView.z;
+ vec3 ro=vec3(0.,0.,8.),rd=normalize(vec3(Q,-3.));
+ vec3 n=rotX(rotY(vec3(0.,0.,1.),uView.y),uView.x);
+ float dn=dot(rd,n);if(abs(dn)<1e-4) return;
+ float t=-dot(ro,n)/dn;if(t<0.) return;
+ vec3 h=ro+rd*t;
+ vec3 ex=rotX(rotY(vec3(1.,0.,0.),uView.y),uView.x),ey=rotX(rotY(vec3(0.,1.,0.),uView.y),uView.x);
+ vec2 uv=vec2(dot(h,ex),dot(h,ey))/2.2;
+ if(abs(uv.x)>1.||abs(uv.y)>1.) return;
+ depth=.5+.2*h.z;
+ if(uPass>.5) return;
+ vec3 Lw=normalize(rotY(vec3(-.55,.55,.7),uView.w));
+ vec3 V=-rd;vec3 hh=normalize(Lw+V);
+ float brush=fbm5(vec3(uv.x*3.,uv.y*160.,uSeed));
+ vec3 base=vec3(.86,.66,.3)*(.7+.5*brush);
+ float lines=0.;
+ vec2 O=vec2(-.35,-.45);
+ for(int k=0;k<14;k++){
+  float a=hash13(vec3(float(k),uSeed,1.))*6.2832,l=.3+.55*hash13(vec3(float(k),uSeed,2.));
+  float s;float d=segD(uv,O,O+vec2(cos(a),sin(a))*l,s);
+  float tick=step(.5,fract(s*46.+float(k)*.31));
+  lines=max(lines,smoothstep(.007,.003,d)*(.5+.5*tick));
+  lines=max(lines,smoothstep(.016,.0,length(uv-O-vec2(cos(a),sin(a))*l))*.8);
+ }
+ lines=max(lines,smoothstep(.012,.006,abs(length(uv-vec2(-.68,.62))-.13)));
+ lines=max(lines,smoothstep(.012,.006,abs(length(uv-vec2(-.68,.62))-.05)));
+ float s2;lines=max(lines,smoothstep(.006,.003,segD(uv,vec2(-.68,.62),vec2(-.68,.35),s2)));
+ lines=max(lines,smoothstep(.012,.006,abs(length(uv-vec2(.5,-.5))-.38))*(.5+.5*step(.5,fract(atan(uv.y+.5,uv.x-.5)*8.))));
+ lines=max(lines,smoothstep(.012,.006,abs(length(uv-vec2(.5,-.5))-.12)));
+ for(int k=0;k<12;k++){float x=-.95+float(k)*.05;float on=step(.5,hash13(vec3(float(k),uSeed,7.)));lines=max(lines,on*smoothstep(.012,.006,abs(uv.x-x))*step(abs(uv.y-.88),.04));}
+ float fr=smoothstep(.02,.0,abs(max(abs(uv.x),abs(uv.y))-.97));lines=max(lines,fr);
+ vec3 c=mix(base,vec3(.14,.09,.03),lines*.9);
+ float aniso=exp(-pow(dot(hh,vec3(1.,0.,0.)),2.)*2.)*pow(max(dot(n,hh),0.),3.);
+ c=c*(.55+.55*max(dot(n,Lw),0.))+vec3(1.,.85,.5)*aniso*(1.-lines)*.5*(.6+brush);
+ col=c*1.05;
+}
+#endif
+
+/* ====================== MODE 6: heliosfera ====================== */
+#ifdef M6
+float hpR(float th){float k=.5*(1.-cos(th));return mix(1.05,2.7,pow(k,1.4));}
+void modeBubble(vec2 P,vec2 pxn,out vec3 col,out float depth){
+ vec2 Q=(P-uOff)*uView.z;
+ col=vec3(0.);depth=.1;
+ if(uPass<.5) col=background(pxn,P)*.8;
+ vec2 sun=vec2(-.55,0.);
+ vec2 d=Q-sun;float rr=length(d),th=atan(d.y,d.x);
+ float R=hpR(th)*(1.+.07*(fbm5(vec3(th*3.,uSeed,1.))-.5));
+ float f=rr/R;
+ float sheath=smoothstep(.55,.66,f)*(1.-smoothstep(.97,1.,f));
+ if(uPass>.5){depth=mix(.12,.62,sheath)+exp(-rr*rr*180.)*.3+.2*exp(-f*5.)*(1.-sheath);return;}
+ float flow=fbm5(vec3(f*24.,th*9.,uSeed+2.)),flow2=fbm5(vec3(f*60.,th*30.,uSeed+4.));
+ vec3 add=vec3(0.);
+ add+=sheath*(vec3(.18,.28,.9)*(.35+1.1*flow)+vec3(.7,.3,.9)*pow(flow2,3.)*.9);
+ add+=vec3(1.,.8,.6)*exp(-pow((f-.6)/.012,2.))*(.5+flow)*.8;
+ add+=vec3(.6,.9,1.)*exp(-pow((f-.99)/.01,2.))*1.5+vec3(.3,.6,1.)*exp(-pow((f-.99)/.05,2.))*.25;
+ add+=vec3(1.,.75,.4)*exp(-f*5.)*.6*(1.-sheath);
+ float fb=rr/(R*1.28);add+=vec3(.9,.4,.8)*exp(-pow((fb-1.)/.01,2.))*.3;
+ add+=vec3(.5,.7,1.)*smoothstep(1.,1.5,f)*(1.-smoothstep(1.5,2.6,f))*pow(fbm5(vec3(Q.x*1.5-Q.y*.2,Q.y*24.,uSeed)),3.)*.18;
+ add+=vec3(1.,.85,.5)*(exp(-rr*rr*180.)*5.+exp(-rr*18.)*.5);
+ for(int i=0;i<2;i++){
+  float a=i==0?.62:-.72;vec2 dir=vec2(cos(a),sin(a));float len=hpR(a)*1.12;
+  float s=dot(Q-sun,dir),pd=length(Q-sun-dir*clamp(s,0.,len));float dash=.5+.5*step(.5,fract(s*18.));
+  vec3 lc=i==0?vec3(.3,.8,1.):vec3(1.,.75,.3);
+  add+=lc*dash*exp(-pd*pd*9000.)*step(0.,s)*1.1;
+  vec2 pe=sun+dir*len;float g=length(Q-pe);
+  add+=lc*(exp(-g*g*6000.)*3.+exp(-g*30.)*.25)+vec3(1.)*exp(-abs(Q.x-pe.x)*70.)*exp(-abs(Q.y-pe.y)*7.)*.35;
+ }
+ col+=add;
+}
+#endif
+
+/* ====================== MODE 7: Pale Blue Dot ====================== */
+#ifdef M7
+void modeDot(vec2 P,vec2 pxn,out vec3 col,out float depth){
+ col=vec3(0.);depth=.1;
+ vec2 o=vec2(-1.8,1.2);vec2 dir=normalize(vec2(1.,-.62));vec2 pp=P-o;
+ float u=dot(pp,dir),v=dot(pp,vec2(-dir.y,dir.x));
+ float w=.12+.05*u;float beam=exp(-v*v/(w*w));
+ vec2 dp=vec2(.42,-.22);float dd=length(P-dp)*(uRes.y/1080.)*540.;
+ if(uPass>.5){depth=mix(.18+.25*beam*smoothstep(0.,.6,u),.88,exp(-dd*dd/500.));return;}
+ col=vec3(.003,.004,.008)+background(pxn,P)*.22;
+ float st=fbm(vec3(v*18.,u*1.4,uSeed))*.7+fbm5(vec3(v*70.,u*3.,uSeed+2.))*.5;
+ vec3 bc=mix(vec3(.9,.55,.2),vec3(.95,.8,.55),fbm5(vec3(u*2.,v*5.,3.)));
+ col+=bc*beam*st*.55*smoothstep(0.,.6,u);
+ col+=vec3(.7,.45,.2)*exp(-pow((v-.45)/.012,2.))*.1*smoothstep(0.,.8,u);
+ float g=exp(-dd*dd/(2.*1.7*1.7));
+ col+=vec3(.62,.8,1.)*g*2.2+vec3(.5,.7,1.)*exp(-dd/9.)*.12;
+}
+#endif
+
+void main(){
+ vec2 px=gl_FragCoord.xy;
+ vec2 P=(px-.5*uRes)/(.5*uRes.y);
+ vec2 pxn=px*(1080./uRes.y);
+ vec3 col=vec3(0.);float depth=.1;
+#ifdef M0
+ modeSpheres(P,pxn,col,depth);
+#endif
+#if defined(M1)||defined(M2)||defined(M3)
+ modeMarch(P,pxn,col,depth);
+#endif
+#ifdef M4
+ modeRecord(P,pxn,col,depth);
+#endif
+#ifdef M5
+ modePlate(P,pxn,col,depth);
+#endif
+#ifdef M6
+ modeBubble(P,pxn,col,depth);
+#endif
+#ifdef M7
+ modeDot(P,pxn,col,depth);
+#endif
+#ifdef M8
+ if(uPass<.5) col=background(pxn,P);
+#endif
+ if(uPass>.5){gl_FragColor=vec4(vec3(clamp(depth,0.,1.)),1.);return;}
+ col=1.-exp(-col*1.25);
+ col=pow(col,vec3(1./2.2));
+ vec2 vc=P*vec2(.5,.62);col*=1.-.28*dot(vc,vc);
+ col+=(hash13(vec3(px,uSeed))-.5)/160.;
+ gl_FragColor=vec4(col,1.);
+}
+
+</script>
+<script>
+"use strict";
+/* ============ SCENARIU ============ */
+const L10N={"ro": {"title": "ODISEEA — Documentar Voyager 1 și 2 (2D / 3D SBS)", "sub": "Documentar Voyager 1 și 2 · imagini NASA/JPL · versiune 2D și 3D SBS pentru ochelari VR", "play": "▶ Redă", "pause": "⏸ Pauză", "fmtLeg": "Format", "m2d": "2D normal · 1920×1080", "mphone": "3D pe telefon în ochelari (ecran plin, proporții corecte)", "mhalf": "3D SBS jumătate · 1920×1080 (fișier comprimat lateral)", "mfull": "3D SBS complet · 3840×1080 (TV / monitor 3D)", "depth": "Adâncime 3D", "swap": "Schimbă ochii (dacă adâncimea pare inversată)", "fit": "Cadru", "fitC": "întreg (cu benzi negre)", "fitF": "umple ecranul (decupat)", "bFs": "⛶ Pe tot ecranul", "bX": "✕ Ieși", "note1": "Pentru Myria MY9801 / Omega 3DBOX, direct din aplicație: alege „3D pe telefon”, apasă „Pe tot ecranul”, pune telefonul în ochelari (peisaj). Fișierele SBS exportate sunt pentru playere/TV; în ochelari ele apar comprimate lateral dacă playerul nu le corectează. Dacă adâncimea pare „înăuntru” în loc de „în afară”, bifează „Schimbă ochii” sau inversează slider-ul.", "sndLeg": "Sunet", "music": "Muzică ambientală generată", "vol": "Volum", "tts": "Voce sintetică (doar la redare; nu se înregistrează)", "fMusic": "♪ Muzica ta (audio)", "fVoice": "🎙 Narațiune înregistrată (audio)", "bScript": "Descarcă textul narațiunii (.txt)", "note2": "Browserul nu poate înregistra vocea sintetică în fișierul video. Pentru voce în film: citește textul narațiunii, încarcă înregistrarea aici și exportă.", "imgLeg": "Imagini și export", "bLoad": "⬇ Încarcă imaginile (NASA / Commons)", "bExp": "⏺ Exportă formatul ales", "bCancel": "✖ Anulează exportul", "fMany": "📁 Imagini proprii (mai multe, în ordine)", "fxOn": "Texturi fractale hiper-detaliate (GPU) în scenele generate", "fxq": "Calitate", "qStd": "standard 2048×1152", "qUltra": "ultra 3072×1728", "fxBg": "Fundal stelar fractal în zonele negre ale pozelor reale (artistic)", "bFx": "↻ Regenerează texturile", "bExpAll": "⏺ Exportă toate (2D + SBS jumătate + SBS complet)", "bCred": "Descarcă creditele (.txt)", "note3": "Exportul se face în timp real (≈ durata filmului). Ține fila în prim-plan și ecranul aprins: dacă fila e ascunsă, exportul se anulează singur. Formatul „complet” (3840×1080) cere un computer puternic. Rezultatul e MP4 dacă browserul permite, altfel WebM.", "lang": "Limba", "noGL": "WebGL indisponibil în acest browser.", "cTitle": "VOYAGER 1 și 2", "cL1": "Imagini: NASA/JPL-Caltech și arhive publice", "cL2": "Misiune lansată în 1977 · încă activă în 2026", "cL3": "Montaj și 3D SBS: ODISEEA", "cL4": "Fără frontiere · trade-free", "cFoot": "Lista completă a creditelor: fișierul de credite exportat", "fxFail": "Generatorul fractal a eșuat ({0}). Folosesc desene simple.", "imgProg": "Imagini: {0}/{1} · {2}", "imgDone": "Gata: {0} imagini din surse publice/proprii, {1} generate local. Înlocuiește-le cu „altă imagine”, „imaginea ta” sau „Imagini proprii”.", "another": "↻ altă imagine", "yours": "📁 imaginea ta", "ownCredit": "Imagine proprie: {0}", "musLoaded": "Muzică încărcată: {0}", "voiceLoaded": "Narațiune încărcată: {0}", "noVoice": "Acest browser nu are voce în limba română; vocea sintetică e oprită (ar citi cu accent străin).", "expCancel": "Export anulat.", "expHidden": "Export anulat: fila a fost ascunsă (s-ar pierde cadre). Reia-l ținând fila în prim-plan.", "expErr": "Eroare la export: {0}", "noRec": "Browserul nu poate înregistra video (MediaRecorder).", "recording": "Se înregistrează ({0}) · ține fila deschisă · {1}", "saved": "Salvat: {0}", "allSaved": "Toate cele trei fișiere au fost salvate.", "ownPlaced": "{0} imagini proprii puse pe scene, în ordinea numelor de fișier ({1} locuri). „Încarcă imaginile” completează restul fără să le atingă pe ale tale.", "fxProg": "Texturi fractale {0}/{1} · {2}", "fxDone": "Texturi fractale regenerate: {0}.", "hint": "Apasă „Încarcă imaginile” sau direct „Redă” (cu imagini generate local, dacă rețeaua nu răspunde).", "crH": "CREDITE IMAGINI · ODISEEA (Voyager 1 și 2)", "crN1": "Verificați creditul fiecărei imagini înainte de publicare; materialele NASA sunt în general fără drepturi de autor, cu excepții.", "crN2": "Imaginile marcate „generat” sunt ilustrații procedurale (fractale) create local, nu fotografii.", "crN3": " În unele fotografii NASA, zonele negre au fundal stelar fractal artistic adăugat (nu e imagine reală).", "crNone": "(imagine generată local, fractal)", "crBg": " [fundal stelar artistic adăugat]", "scH": "NARAȚIUNE · ODISEEA (Voyager 1 și 2)", "scN": "Citește textul la ritmul indicat și încarcă înregistrarea la „Narațiune înregistrată”.", "srcGen": "generat", "srcLocal": "local"}, "en": {"title": "ODISEEA — Voyager 1 & 2 Documentary (2D / 3D SBS)", "sub": "Voyager 1 & 2 documentary · NASA/JPL images · 2D and 3D SBS versions for VR glasses", "play": "▶ Play", "pause": "⏸ Pause", "fmtLeg": "Format", "m2d": "Normal 2D · 1920×1080", "mphone": "3D on phone in glasses (full screen, correct proportions)", "mhalf": "3D SBS half · 1920×1080 (horizontally squeezed file)", "mfull": "3D SBS full · 3840×1080 (3D TV / monitor)", "depth": "3D depth", "swap": "Swap eyes (if depth looks inverted)", "fit": "Frame", "fitC": "whole picture (with black bars)", "fitF": "fill the screen (cropped)", "bFs": "⛶ Full screen", "bX": "✕ Exit", "note1": "For Myria MY9801 / Omega 3DBOX, straight from the app: choose “3D on phone”, press “Full screen”, put the phone in the glasses (landscape). Exported SBS files are meant for players/TVs; in the glasses they look squeezed sideways unless the player corrects them. If depth looks “inward” instead of “outward”, tick “Swap eyes” or invert the slider.", "sndLeg": "Sound", "music": "Generated ambient music", "vol": "Volume", "tts": "Synthetic voice (live playback only; not recorded)", "fMusic": "♪ Your music (audio)", "fVoice": "🎙 Recorded narration (audio)", "bScript": "Download narration text (.txt)", "note2": "The browser cannot record the synthetic voice into the video file. For a voice in the film: read the narration text, upload your recording here and export.", "imgLeg": "Images and export", "bLoad": "⬇ Load images (NASA / Commons)", "bExp": "⏺ Export the chosen format", "bCancel": "✖ Cancel export", "fMany": "📁 Your own images (several, in order)", "fxOn": "Hyper-detailed fractal textures (GPU) in generated scenes", "fxq": "Quality", "qStd": "standard 2048×1152", "qUltra": "ultra 3072×1728", "fxBg": "Fractal starfield in the black areas of real photos (artistic)", "bFx": "↻ Regenerate textures", "bExpAll": "⏺ Export all (2D + SBS half + SBS full)", "bCred": "Download credits (.txt)", "note3": "Export runs in real time (≈ the film's length). Keep the tab in the foreground and the screen on: if the tab is hidden, the export cancels itself. The “full” format (3840×1080) needs a powerful computer. The result is MP4 if the browser allows, otherwise WebM.", "lang": "Language", "noGL": "WebGL is not available in this browser.", "cTitle": "VOYAGER 1 & 2", "cL1": "Images: NASA/JPL-Caltech and public archives", "cL2": "Mission launched in 1977 · still active in 2026", "cL3": "Editing and 3D SBS: ODISEEA", "cL4": "Without borders · trade-free", "cFoot": "Full list of credits: the exported credits file", "fxFail": "The fractal generator failed ({0}). Using simple drawings.", "imgProg": "Images: {0}/{1} · {2}", "imgDone": "Done: {0} images from public/own sources, {1} generated locally. Replace them with “another image”, “your image” or “Your own images”.", "another": "↻ another image", "yours": "📁 your image", "ownCredit": "Own image: {0}", "musLoaded": "Music loaded: {0}", "voiceLoaded": "Narration loaded: {0}", "noVoice": "This browser has no voice for this language; the synthetic voice is off (it would read with a foreign accent).", "expCancel": "Export cancelled.", "expHidden": "Export cancelled: the tab was hidden (frames would be lost). Restart it with the tab in the foreground.", "expErr": "Export error: {0}", "noRec": "The browser cannot record video (MediaRecorder).", "recording": "Recording ({0}) · keep the tab open · {1}", "saved": "Saved: {0}", "allSaved": "All three files have been saved.", "ownPlaced": "{0} own images placed on scenes, in file-name order ({1} slots). “Load images” fills in the rest without touching yours.", "fxProg": "Fractal textures {0}/{1} · {2}", "fxDone": "Fractal textures regenerated: {0}.", "hint": "Press “Load images” or just “Play” (with locally generated images if the network does not respond).", "crH": "IMAGE CREDITS · ODISEEA (Voyager 1 & 2)", "crN1": "Check each image's credit before publishing; NASA material is generally copyright-free, with exceptions.", "crN2": "Images marked “generated” are procedural (fractal) illustrations created locally, not photographs.", "crN3": " In some NASA photos, the black areas have an artistic fractal starfield added (not a real image).", "crNone": "(locally generated image, fractal)", "crBg": " [artistic starfield added]", "scH": "NARRATION · ODISEEA (Voyager 1 & 2)", "scN": "Read the text at the indicated pace and upload your recording under “Recorded narration”.", "srcGen": "generated", "srcLocal": "local"}, "fr": {"title": "ODISEEA — Documentaire Voyager 1 et 2 (2D / 3D SBS)", "sub": "Documentaire Voyager 1 et 2 · images NASA/JPL · versions 2D et 3D SBS pour lunettes VR", "play": "▶ Lecture", "pause": "⏸ Pause", "fmtLeg": "Format", "m2d": "2D normal · 1920×1080", "mphone": "3D sur téléphone dans les lunettes (plein écran, bonnes proportions)", "mhalf": "3D SBS moitié · 1920×1080 (fichier comprimé latéralement)", "mfull": "3D SBS complet · 3840×1080 (TV / moniteur 3D)", "depth": "Profondeur 3D", "swap": "Inverser les yeux (si la profondeur semble inversée)", "fit": "Cadre", "fitC": "image entière (avec bandes noires)", "fitF": "remplir l'écran (recadré)", "bFs": "⛶ Plein écran", "bX": "✕ Quitter", "note1": "Pour les Myria MY9801 / Omega 3DBOX, directement depuis l'application : choisissez « 3D sur téléphone », appuyez sur « Plein écran », placez le téléphone dans les lunettes (paysage). Les fichiers SBS exportés sont destinés aux lecteurs/TV ; dans les lunettes, ils apparaissent comprimés latéralement si le lecteur ne les corrige pas. Si la profondeur semble « vers l'intérieur » au lieu de « vers l'extérieur », cochez « Inverser les yeux » ou inversez le curseur.", "sndLeg": "Son", "music": "Musique d'ambiance générée", "vol": "Volume", "tts": "Voix de synthèse (lecture seulement ; non enregistrée)", "fMusic": "♪ Votre musique (audio)", "fVoice": "🎙 Narration enregistrée (audio)", "bScript": "Télécharger le texte de la narration (.txt)", "note2": "Le navigateur ne peut pas enregistrer la voix de synthèse dans le fichier vidéo. Pour une voix dans le film : lisez le texte de la narration, importez votre enregistrement ici et exportez.", "imgLeg": "Images et export", "bLoad": "⬇ Charger les images (NASA / Commons)", "bExp": "⏺ Exporter le format choisi", "bCancel": "✖ Annuler l'export", "fMany": "📁 Vos propres images (plusieurs, dans l'ordre)", "fxOn": "Textures fractales hyper-détaillées (GPU) dans les scènes générées", "fxq": "Qualité", "qStd": "standard 2048×1152", "qUltra": "ultra 3072×1728", "fxBg": "Fond d'étoiles fractal dans les zones noires des photos réelles (artistique)", "bFx": "↻ Régénérer les textures", "bExpAll": "⏺ Tout exporter (2D + SBS moitié + SBS complet)", "bCred": "Télécharger les crédits (.txt)", "note3": "L'export se fait en temps réel (≈ durée du film). Gardez l'onglet au premier plan et l'écran allumé : si l'onglet est masqué, l'export s'annule. Le format « complet » (3840×1080) demande un ordinateur puissant. Le résultat est un MP4 si le navigateur le permet, sinon un WebM.", "lang": "Langue", "noGL": "WebGL n'est pas disponible dans ce navigateur.", "cTitle": "VOYAGER 1 et 2", "cL1": "Images : NASA/JPL-Caltech et archives publiques", "cL2": "Mission lancée en 1977 · toujours active en 2026", "cL3": "Montage et 3D SBS : ODISEEA", "cL4": "Sans frontières · trade-free", "cFoot": "Liste complète des crédits : le fichier de crédits exporté", "fxFail": "Le générateur fractal a échoué ({0}). Utilisation de dessins simples.", "imgProg": "Images : {0}/{1} · {2}", "imgDone": "Terminé : {0} images de sources publiques/personnelles, {1} générées localement. Remplacez-les via « autre image », « votre image » ou « Vos propres images ».", "another": "↻ autre image", "yours": "📁 votre image", "ownCredit": "Image personnelle : {0}", "musLoaded": "Musique chargée : {0}", "voiceLoaded": "Narration chargée : {0}", "noVoice": "Ce navigateur n'a pas de voix pour cette langue ; la voix de synthèse est désactivée (elle lirait avec un accent étranger).", "expCancel": "Export annulé.", "expHidden": "Export annulé : l'onglet a été masqué (des images seraient perdues). Relancez-le en gardant l'onglet au premier plan.", "expErr": "Erreur d'export : {0}", "noRec": "Le navigateur ne peut pas enregistrer de vidéo (MediaRecorder).", "recording": "Enregistrement ({0}) · gardez l'onglet ouvert · {1}", "saved": "Enregistré : {0}", "allSaved": "Les trois fichiers ont été enregistrés.", "ownPlaced": "{0} images personnelles placées sur les scènes, dans l'ordre des noms de fichier ({1} emplacements). « Charger les images » complète le reste sans toucher aux vôtres.", "fxProg": "Textures fractales {0}/{1} · {2}", "fxDone": "Textures fractales régénérées : {0}.", "hint": "Appuyez sur « Charger les images » ou directement sur « Lecture » (avec des images générées localement si le réseau ne répond pas).", "crH": "CRÉDITS DES IMAGES · ODISEEA (Voyager 1 et 2)", "crN1": "Vérifiez le crédit de chaque image avant publication ; les documents de la NASA sont en général libres de droits, avec des exceptions.", "crN2": "Les images marquées « généré » sont des illustrations procédurales (fractales) créées localement, pas des photographies.", "crN3": " Dans certaines photos de la NASA, les zones noires reçoivent un fond d'étoiles fractal artistique (ce n'est pas une image réelle).", "crNone": "(image générée localement, fractale)", "crBg": " [fond d'étoiles artistique ajouté]", "scH": "NARRATION · ODISEEA (Voyager 1 et 2)", "scN": "Lisez le texte au rythme indiqué et importez votre enregistrement dans « Narration enregistrée ».", "srcGen": "généré", "srcLocal": "local"}, "it": {"title": "ODISEEA — Documentario Voyager 1 e 2 (2D / 3D SBS)", "sub": "Documentario Voyager 1 e 2 · immagini NASA/JPL · versioni 2D e 3D SBS per occhiali VR", "play": "▶ Riproduci", "pause": "⏸ Pausa", "fmtLeg": "Formato", "m2d": "2D normale · 1920×1080", "mphone": "3D su telefono negli occhiali (schermo intero, proporzioni corrette)", "mhalf": "3D SBS metà · 1920×1080 (file compresso lateralmente)", "mfull": "3D SBS completo · 3840×1080 (TV / monitor 3D)", "depth": "Profondità 3D", "swap": "Scambia gli occhi (se la profondità sembra invertita)", "fit": "Inquadratura", "fitC": "intera (con bande nere)", "fitF": "riempi lo schermo (ritagliata)", "bFs": "⛶ Schermo intero", "bX": "✕ Esci", "note1": "Per Myria MY9801 / Omega 3DBOX, direttamente dall'app: scegli «3D su telefono», premi «Schermo intero», inserisci il telefono negli occhiali (orizzontale). I file SBS esportati sono pensati per lettori/TV; negli occhiali appaiono compressi lateralmente se il lettore non li corregge. Se la profondità sembra «verso l'interno» invece che «verso l'esterno», spunta «Scambia gli occhi» o inverti il cursore.", "sndLeg": "Audio", "music": "Musica d'atmosfera generata", "vol": "Volume", "tts": "Voce sintetica (solo in riproduzione; non viene registrata)", "fMusic": "♪ La tua musica (audio)", "fVoice": "🎙 Narrazione registrata (audio)", "bScript": "Scarica il testo della narrazione (.txt)", "note2": "Il browser non può registrare la voce sintetica nel file video. Per una voce nel film: leggi il testo della narrazione, carica qui la tua registrazione ed esporta.", "imgLeg": "Immagini ed esportazione", "bLoad": "⬇ Carica le immagini (NASA / Commons)", "bExp": "⏺ Esporta il formato scelto", "bCancel": "✖ Annulla l'esportazione", "fMany": "📁 Immagini tue (più d'una, in ordine)", "fxOn": "Texture frattali iper-dettagliate (GPU) nelle scene generate", "fxq": "Qualità", "qStd": "standard 2048×1152", "qUltra": "ultra 3072×1728", "fxBg": "Sfondo stellato frattale nelle zone nere delle foto reali (artistico)", "bFx": "↻ Rigenera le texture", "bExpAll": "⏺ Esporta tutto (2D + SBS metà + SBS completo)", "bCred": "Scarica i crediti (.txt)", "note3": "L'esportazione avviene in tempo reale (≈ durata del film). Tieni la scheda in primo piano e lo schermo acceso: se la scheda viene nascosta, l'esportazione si annulla. Il formato «completo» (3840×1080) richiede un computer potente. Il risultato è MP4 se il browser lo permette, altrimenti WebM.", "lang": "Lingua", "noGL": "WebGL non è disponibile in questo browser.", "cTitle": "VOYAGER 1 e 2", "cL1": "Immagini: NASA/JPL-Caltech e archivi pubblici", "cL2": "Missione lanciata nel 1977 · ancora attiva nel 2026", "cL3": "Montaggio e 3D SBS: ODISEEA", "cL4": "Senza frontiere · trade-free", "cFoot": "Elenco completo dei crediti: il file dei crediti esportato", "fxFail": "Il generatore frattale non è riuscito ({0}). Uso disegni semplici.", "imgProg": "Immagini: {0}/{1} · {2}", "imgDone": "Fatto: {0} immagini da fonti pubbliche/proprie, {1} generate localmente. Sostituiscile con «altra immagine», «la tua immagine» o «Immagini tue».", "another": "↻ altra immagine", "yours": "📁 la tua immagine", "ownCredit": "Immagine propria: {0}", "musLoaded": "Musica caricata: {0}", "voiceLoaded": "Narrazione caricata: {0}", "noVoice": "Questo browser non ha una voce per questa lingua; la voce sintetica è disattivata (leggerebbe con accento straniero).", "expCancel": "Esportazione annullata.", "expHidden": "Esportazione annullata: la scheda è stata nascosta (si perderebbero fotogrammi). Riavviala tenendo la scheda in primo piano.", "expErr": "Errore di esportazione: {0}", "noRec": "Il browser non può registrare video (MediaRecorder).", "recording": "Registrazione ({0}) · tieni la scheda aperta · {1}", "saved": "Salvato: {0}", "allSaved": "Tutti e tre i file sono stati salvati.", "ownPlaced": "{0} immagini proprie inserite nelle scene, in ordine di nome file ({1} posti). «Carica le immagini» completa il resto senza toccare le tue.", "fxProg": "Texture frattali {0}/{1} · {2}", "fxDone": "Texture frattali rigenerate: {0}.", "hint": "Premi «Carica le immagini» o direttamente «Riproduci» (con immagini generate localmente se la rete non risponde).", "crH": "CREDITI DELLE IMMAGINI · ODISEEA (Voyager 1 e 2)", "crN1": "Verificate il credito di ogni immagine prima della pubblicazione; il materiale NASA è in genere privo di diritti d'autore, con eccezioni.", "crN2": "Le immagini contrassegnate «generato» sono illustrazioni procedurali (frattali) create localmente, non fotografie.", "crN3": " In alcune foto NASA, le zone nere hanno uno sfondo stellato frattale artistico aggiunto (non è un'immagine reale).", "crNone": "(immagine generata localmente, frattale)", "crBg": " [sfondo stellato artistico aggiunto]", "scH": "NARRAZIONE · ODISEEA (Voyager 1 e 2)", "scN": "Leggi il testo al ritmo indicato e carica la registrazione in «Narrazione registrata».", "srcGen": "generato", "srcLocal": "locale"}, "es": {"title": "ODISEEA — Documental Voyager 1 y 2 (2D / 3D SBS)", "sub": "Documental Voyager 1 y 2 · imágenes NASA/JPL · versiones 2D y 3D SBS para gafas VR", "play": "▶ Reproducir", "pause": "⏸ Pausa", "fmtLeg": "Formato", "m2d": "2D normal · 1920×1080", "mphone": "3D en el teléfono dentro de las gafas (pantalla completa, proporciones correctas)", "mhalf": "3D SBS mitad · 1920×1080 (archivo comprimido lateralmente)", "mfull": "3D SBS completo · 3840×1080 (TV / monitor 3D)", "depth": "Profundidad 3D", "swap": "Intercambiar ojos (si la profundidad parece invertida)", "fit": "Encuadre", "fitC": "completo (con bandas negras)", "fitF": "llenar la pantalla (recortado)", "bFs": "⛶ Pantalla completa", "bX": "✕ Salir", "note1": "Para Myria MY9801 / Omega 3DBOX, directamente desde la aplicación: elige «3D en el teléfono», pulsa «Pantalla completa» y coloca el teléfono en las gafas (horizontal). Los archivos SBS exportados son para reproductores/TV; en las gafas se ven comprimidos lateralmente si el reproductor no los corrige. Si la profundidad parece «hacia adentro» en lugar de «hacia afuera», marca «Intercambiar ojos» o invierte el control deslizante.", "sndLeg": "Sonido", "music": "Música ambiental generada", "vol": "Volumen", "tts": "Voz sintética (solo en la reproducción; no se graba)", "fMusic": "♪ Tu música (audio)", "fVoice": "🎙 Narración grabada (audio)", "bScript": "Descargar el texto de la narración (.txt)", "note2": "El navegador no puede grabar la voz sintética en el archivo de vídeo. Para tener voz en la película: lee el texto de la narración, sube tu grabación aquí y exporta.", "imgLeg": "Imágenes y exportación", "bLoad": "⬇ Cargar las imágenes (NASA / Commons)", "bExp": "⏺ Exportar el formato elegido", "bCancel": "✖ Cancelar la exportación", "fMany": "📁 Imágenes propias (varias, en orden)", "fxOn": "Texturas fractales hiperdetalladas (GPU) en las escenas generadas", "fxq": "Calidad", "qStd": "estándar 2048×1152", "qUltra": "ultra 3072×1728", "fxBg": "Fondo estelar fractal en las zonas negras de las fotos reales (artístico)", "bFx": "↻ Regenerar las texturas", "bExpAll": "⏺ Exportar todo (2D + SBS mitad + SBS completo)", "bCred": "Descargar los créditos (.txt)", "note3": "La exportación se hace en tiempo real (≈ duración de la película). Mantén la pestaña en primer plano y la pantalla encendida: si la pestaña se oculta, la exportación se cancela. El formato «completo» (3840×1080) requiere un ordenador potente. El resultado es MP4 si el navegador lo permite; si no, WebM.", "lang": "Idioma", "noGL": "WebGL no está disponible en este navegador.", "cTitle": "VOYAGER 1 y 2", "cL1": "Imágenes: NASA/JPL-Caltech y archivos públicos", "cL2": "Misión lanzada en 1977 · aún activa en 2026", "cL3": "Montaje y 3D SBS: ODISEEA", "cL4": "Sin fronteras · trade-free", "cFoot": "Lista completa de créditos: el archivo de créditos exportado", "fxFail": "El generador fractal ha fallado ({0}). Se usan dibujos simples.", "imgProg": "Imágenes: {0}/{1} · {2}", "imgDone": "Listo: {0} imágenes de fuentes públicas/propias, {1} generadas localmente. Sustitúyelas con «otra imagen», «tu imagen» o «Imágenes propias».", "another": "↻ otra imagen", "yours": "📁 tu imagen", "ownCredit": "Imagen propia: {0}", "musLoaded": "Música cargada: {0}", "voiceLoaded": "Narración cargada: {0}", "noVoice": "Este navegador no tiene voz para este idioma; la voz sintética está desactivada (leería con acento extranjero).", "expCancel": "Exportación cancelada.", "expHidden": "Exportación cancelada: la pestaña se ocultó (se perderían fotogramas). Reiníciala manteniendo la pestaña en primer plano.", "expErr": "Error de exportación: {0}", "noRec": "El navegador no puede grabar vídeo (MediaRecorder).", "recording": "Grabando ({0}) · mantén la pestaña abierta · {1}", "saved": "Guardado: {0}", "allSaved": "Los tres archivos se han guardado.", "ownPlaced": "{0} imágenes propias colocadas en las escenas, por orden de nombre de archivo ({1} huecos). «Cargar las imágenes» completa el resto sin tocar las tuyas.", "fxProg": "Texturas fractales {0}/{1} · {2}", "fxDone": "Texturas fractales regeneradas: {0}.", "hint": "Pulsa «Cargar las imágenes» o directamente «Reproducir» (con imágenes generadas localmente si la red no responde).", "crH": "CRÉDITOS DE LAS IMÁGENES · ODISEEA (Voyager 1 y 2)", "crN1": "Comprueba el crédito de cada imagen antes de publicar; el material de la NASA suele estar libre de derechos de autor, con excepciones.", "crN2": "Las imágenes marcadas «generado» son ilustraciones procedurales (fractales) creadas localmente, no fotografías.", "crN3": " En algunas fotos de la NASA, las zonas negras tienen un fondo estelar fractal artístico añadido (no es una imagen real).", "crNone": "(imagen generada localmente, fractal)", "crBg": " [fondo estelar artístico añadido]", "scH": "NARRACIÓN · ODISEEA (Voyager 1 y 2)", "scN": "Lee el texto al ritmo indicado y sube la grabación en «Narración grabada».", "srcGen": "generado", "srcLocal": "local"}, "pt": {"title": "ODISEEA — Documentário Voyager 1 e 2 (2D / 3D SBS)", "sub": "Documentário Voyager 1 e 2 · imagens NASA/JPL · versões 2D e 3D SBS para óculos VR", "play": "▶ Reproduzir", "pause": "⏸ Pausa", "fmtLeg": "Formato", "m2d": "2D normal · 1920×1080", "mphone": "3D no telemóvel dentro dos óculos (ecrã inteiro, proporções corretas)", "mhalf": "3D SBS metade · 1920×1080 (ficheiro comprimido lateralmente)", "mfull": "3D SBS completo · 3840×1080 (TV / monitor 3D)", "depth": "Profundidade 3D", "swap": "Trocar os olhos (se a profundidade parecer invertida)", "fit": "Enquadramento", "fitC": "inteiro (com barras pretas)", "fitF": "preencher o ecrã (cortado)", "bFs": "⛶ Ecrã inteiro", "bX": "✕ Sair", "note1": "Para Myria MY9801 / Omega 3DBOX, diretamente na aplicação: escolha «3D no telemóvel», prima «Ecrã inteiro» e coloque o telemóvel nos óculos (horizontal). Os ficheiros SBS exportados destinam-se a leitores/TV; nos óculos aparecem comprimidos lateralmente se o leitor não os corrigir. Se a profundidade parecer «para dentro» em vez de «para fora», marque «Trocar os olhos» ou inverta o cursor.", "sndLeg": "Som", "music": "Música ambiente gerada", "vol": "Volume", "tts": "Voz sintética (só durante a reprodução; não é gravada)", "fMusic": "♪ A sua música (áudio)", "fVoice": "🎙 Narração gravada (áudio)", "bScript": "Descarregar o texto da narração (.txt)", "note2": "O navegador não consegue gravar a voz sintética no ficheiro de vídeo. Para ter voz no filme: leia o texto da narração, carregue aqui a sua gravação e exporte.", "imgLeg": "Imagens e exportação", "bLoad": "⬇ Carregar as imagens (NASA / Commons)", "bExp": "⏺ Exportar o formato escolhido", "bCancel": "✖ Cancelar a exportação", "fMany": "📁 Imagens próprias (várias, por ordem)", "fxOn": "Texturas fractais hiperdetalhadas (GPU) nas cenas geradas", "fxq": "Qualidade", "qStd": "padrão 2048×1152", "qUltra": "ultra 3072×1728", "fxBg": "Fundo estelar fractal nas zonas negras das fotos reais (artístico)", "bFx": "↻ Regenerar as texturas", "bExpAll": "⏺ Exportar tudo (2D + SBS metade + SBS completo)", "bCred": "Descarregar os créditos (.txt)", "note3": "A exportação faz-se em tempo real (≈ duração do filme). Mantenha o separador em primeiro plano e o ecrã aceso: se o separador ficar oculto, a exportação cancela-se. O formato «completo» (3840×1080) exige um computador potente. O resultado é MP4 se o navegador permitir, caso contrário WebM.", "lang": "Idioma", "noGL": "O WebGL não está disponível neste navegador.", "cTitle": "VOYAGER 1 e 2", "cL1": "Imagens: NASA/JPL-Caltech e arquivos públicos", "cL2": "Missão lançada em 1977 · ainda ativa em 2026", "cL3": "Montagem e 3D SBS: ODISEEA", "cL4": "Sem fronteiras · trade-free", "cFoot": "Lista completa de créditos: o ficheiro de créditos exportado", "fxFail": "O gerador fractal falhou ({0}). A usar desenhos simples.", "imgProg": "Imagens: {0}/{1} · {2}", "imgDone": "Concluído: {0} imagens de fontes públicas/próprias, {1} geradas localmente. Substitua-as com «outra imagem», «a sua imagem» ou «Imagens próprias».", "another": "↻ outra imagem", "yours": "📁 a sua imagem", "ownCredit": "Imagem própria: {0}", "musLoaded": "Música carregada: {0}", "voiceLoaded": "Narração carregada: {0}", "noVoice": "Este navegador não tem voz para este idioma; a voz sintética está desligada (leria com sotaque estrangeiro).", "expCancel": "Exportação cancelada.", "expHidden": "Exportação cancelada: o separador ficou oculto (perder-se-iam fotogramas). Recomece com o separador em primeiro plano.", "expErr": "Erro de exportação: {0}", "noRec": "O navegador não consegue gravar vídeo (MediaRecorder).", "recording": "A gravar ({0}) · mantenha o separador aberto · {1}", "saved": "Guardado: {0}", "allSaved": "Os três ficheiros foram guardados.", "ownPlaced": "{0} imagens próprias colocadas nas cenas, por ordem de nome de ficheiro ({1} lugares). «Carregar as imagens» completa o resto sem tocar nas suas.", "fxProg": "Texturas fractais {0}/{1} · {2}", "fxDone": "Texturas fractais regeneradas: {0}.", "hint": "Prima «Carregar as imagens» ou diretamente «Reproduzir» (com imagens geradas localmente se a rede não responder).", "crH": "CRÉDITOS DAS IMAGENS · ODISEEA (Voyager 1 e 2)", "crN1": "Verifique o crédito de cada imagem antes de publicar; o material da NASA é, em geral, livre de direitos de autor, com exceções.", "crN2": "As imagens marcadas «gerado» são ilustrações processuais (fractais) criadas localmente, não fotografias.", "crN3": " Em algumas fotos da NASA, as zonas negras têm um fundo estelar fractal artístico acrescentado (não é uma imagem real).", "crNone": "(imagem gerada localmente, fractal)", "crBg": " [fundo estelar artístico acrescentado]", "scH": "NARRAÇÃO · ODISEEA (Voyager 1 e 2)", "scN": "Leia o texto ao ritmo indicado e carregue a gravação em «Narração gravada».", "srcGen": "gerado", "srcLocal": "local"}, "de": {"title": "ODISEEA — Dokumentation Voyager 1 und 2 (2D / 3D SBS)", "sub": "Dokumentation Voyager 1 und 2 · NASA/JPL-Bilder · 2D- und 3D-SBS-Versionen für VR-Brillen", "play": "▶ Abspielen", "pause": "⏸ Pause", "fmtLeg": "Format", "m2d": "2D normal · 1920×1080", "mphone": "3D auf dem Handy in der Brille (Vollbild, richtige Proportionen)", "mhalf": "3D SBS halb · 1920×1080 (seitlich gestauchte Datei)", "mfull": "3D SBS voll · 3840×1080 (3D-Fernseher / Monitor)", "depth": "3D-Tiefe", "swap": "Augen vertauschen (wenn die Tiefe invertiert wirkt)", "fit": "Bildausschnitt", "fitC": "ganzes Bild (mit schwarzen Balken)", "fitF": "Bildschirm füllen (beschnitten)", "bFs": "⛶ Vollbild", "bX": "✕ Beenden", "note1": "Für Myria MY9801 / Omega 3DBOX direkt in der App: „3D auf dem Handy“ wählen, „Vollbild“ drücken und das Handy in die Brille legen (quer). Die exportierten SBS-Dateien sind für Player/Fernseher gedacht; in der Brille erscheinen sie seitlich gestaucht, wenn der Player sie nicht korrigiert. Wirkt die Tiefe „nach innen“ statt „nach außen“, „Augen vertauschen“ aktivieren oder den Regler umkehren.", "sndLeg": "Ton", "music": "Erzeugte Ambient-Musik", "vol": "Lautstärke", "tts": "Synthetische Stimme (nur bei der Wiedergabe; wird nicht aufgenommen)", "fMusic": "♪ Deine Musik (Audio)", "fVoice": "🎙 Aufgenommener Sprechertext (Audio)", "bScript": "Sprechertext herunterladen (.txt)", "note2": "Der Browser kann die synthetische Stimme nicht in die Videodatei aufnehmen. Für eine Stimme im Film: den Sprechertext lesen, die Aufnahme hier hochladen und exportieren.", "imgLeg": "Bilder und Export", "bLoad": "⬇ Bilder laden (NASA / Commons)", "bExp": "⏺ Gewähltes Format exportieren", "bCancel": "✖ Export abbrechen", "fMany": "📁 Eigene Bilder (mehrere, der Reihe nach)", "fxOn": "Hyperdetaillierte Fraktaltexturen (GPU) in den erzeugten Szenen", "fxq": "Qualität", "qStd": "Standard 2048×1152", "qUltra": "Ultra 3072×1728", "fxBg": "Fraktaler Sternenhimmel in den schwarzen Bereichen echter Fotos (künstlerisch)", "bFx": "↻ Texturen neu erzeugen", "bExpAll": "⏺ Alles exportieren (2D + SBS halb + SBS voll)", "bCred": "Credits herunterladen (.txt)", "note3": "Der Export läuft in Echtzeit (≈ Filmlänge). Den Tab im Vordergrund und den Bildschirm eingeschaltet lassen: Wird der Tab ausgeblendet, bricht der Export von selbst ab. Das Format „voll“ (3840×1080) braucht einen leistungsstarken Computer. Das Ergebnis ist MP4, wenn der Browser es erlaubt, sonst WebM.", "lang": "Sprache", "noGL": "WebGL ist in diesem Browser nicht verfügbar.", "cTitle": "VOYAGER 1 und 2", "cL1": "Bilder: NASA/JPL-Caltech und öffentliche Archive", "cL2": "Mission gestartet 1977 · 2026 noch aktiv", "cL3": "Schnitt und 3D SBS: ODISEEA", "cL4": "Ohne Grenzen · trade-free", "cFoot": "Vollständige Credits: die exportierte Credits-Datei", "fxFail": "Der Fraktalgenerator ist fehlgeschlagen ({0}). Einfache Zeichnungen werden verwendet.", "imgProg": "Bilder: {0}/{1} · {2}", "imgDone": "Fertig: {0} Bilder aus öffentlichen/eigenen Quellen, {1} lokal erzeugt. Ersetze sie mit „anderes Bild“, „dein Bild“ oder „Eigene Bilder“.", "another": "↻ anderes Bild", "yours": "📁 dein Bild", "ownCredit": "Eigenes Bild: {0}", "musLoaded": "Musik geladen: {0}", "voiceLoaded": "Sprechertext geladen: {0}", "noVoice": "Dieser Browser hat keine Stimme für diese Sprache; die synthetische Stimme ist aus (sie würde mit fremdem Akzent lesen).", "expCancel": "Export abgebrochen.", "expHidden": "Export abgebrochen: Der Tab wurde ausgeblendet (Bilder gingen verloren). Starte ihn neu und lass den Tab im Vordergrund.", "expErr": "Exportfehler: {0}", "noRec": "Der Browser kann kein Video aufnehmen (MediaRecorder).", "recording": "Aufnahme ({0}) · Tab offen lassen · {1}", "saved": "Gespeichert: {0}", "allSaved": "Alle drei Dateien wurden gespeichert.", "ownPlaced": "{0} eigene Bilder in der Reihenfolge der Dateinamen auf die Szenen gelegt ({1} Plätze). „Bilder laden“ füllt den Rest auf, ohne deine zu verändern.", "fxProg": "Fraktaltexturen {0}/{1} · {2}", "fxDone": "Fraktaltexturen neu erzeugt: {0}.", "hint": "„Bilder laden“ drücken oder direkt „Abspielen“ (mit lokal erzeugten Bildern, falls das Netzwerk nicht antwortet).", "crH": "BILDNACHWEISE · ODISEEA (Voyager 1 und 2)", "crN1": "Prüfe vor der Veröffentlichung den Nachweis jedes Bildes; NASA-Material ist in der Regel urheberrechtsfrei, mit Ausnahmen.", "crN2": "Als „erzeugt“ markierte Bilder sind lokal erstellte prozedurale (fraktale) Illustrationen, keine Fotografien.", "crN3": " In manchen NASA-Fotos wurde den schwarzen Bereichen ein künstlerischer fraktaler Sternenhimmel hinzugefügt (kein echtes Bild).", "crNone": "(lokal erzeugtes Bild, fraktal)", "crBg": " [künstlerischer Sternenhimmel hinzugefügt]", "scH": "SPRECHERTEXT · ODISEEA (Voyager 1 und 2)", "scN": "Lies den Text im angegebenen Tempo und lade die Aufnahme unter „Aufgenommener Sprechertext“ hoch.", "srcGen": "erzeugt", "srcLocal": "lokal"}, "hu": {"title": "ODISEEA — Voyager 1 és 2 dokumentumfilm (2D / 3D SBS)", "sub": "Voyager 1 és 2 dokumentumfilm · NASA/JPL-képek · 2D és 3D SBS változat VR-szemüvegekhez", "play": "▶ Lejátszás", "pause": "⏸ Szünet", "fmtLeg": "Formátum", "m2d": "Normál 2D · 1920×1080", "mphone": "3D telefonon a szemüvegben (teljes képernyő, helyes arányok)", "mhalf": "3D SBS fél · 1920×1080 (oldalirányban összenyomott fájl)", "mfull": "3D SBS teljes · 3840×1080 (3D TV / monitor)", "depth": "3D mélység", "swap": "Szemek felcserélése (ha a mélység fordítottnak tűnik)", "fit": "Képkivágás", "fitC": "teljes kép (fekete sávokkal)", "fitF": "kitölti a képernyőt (levágva)", "bFs": "⛶ Teljes képernyő", "bX": "✕ Kilépés", "note1": "Myria MY9801 / Omega 3DBOX esetén közvetlenül az alkalmazásból: válaszd a „3D telefonon” módot, nyomd meg a „Teljes képernyő” gombot, majd tedd a telefont a szemüvegbe (fekvő tájolás). A kiexportált SBS-fájlok lejátszókhoz/TV-hez valók; a szemüvegben oldalirányban összenyomottnak látszanak, ha a lejátszó nem korrigálja őket. Ha a mélység „befelé” látszik „kifelé” helyett, jelöld be a „Szemek felcserélése” opciót, vagy fordítsd meg a csúszkát.", "sndLeg": "Hang", "music": "Generált hangulatzene", "vol": "Hangerő", "tts": "Szintetikus hang (csak lejátszáskor; nem kerül rögzítésre)", "fMusic": "♪ Saját zene (hang)", "fVoice": "🎙 Felvett narráció (hang)", "bScript": "Narrációs szöveg letöltése (.txt)", "note2": "A böngésző nem tudja a szintetikus hangot a videófájlba rögzíteni. Hang a filmben: olvasd fel a narrációs szöveget, töltsd fel ide a felvételt, és exportálj.", "imgLeg": "Képek és exportálás", "bLoad": "⬇ Képek betöltése (NASA / Commons)", "bExp": "⏺ A kiválasztott formátum exportálása", "bCancel": "✖ Exportálás megszakítása", "fMany": "📁 Saját képek (több, sorrendben)", "fxOn": "Hiperrészletes fraktáltextúrák (GPU) a generált jelenetekben", "fxq": "Minőség", "qStd": "normál 2048×1152", "qUltra": "ultra 3072×1728", "fxBg": "Fraktál csillagos háttér a valódi fotók fekete részein (művészi)", "bFx": "↻ Textúrák újragenerálása", "bExpAll": "⏺ Minden exportálása (2D + SBS fél + SBS teljes)", "bCred": "Közreműködők letöltése (.txt)", "note3": "Az exportálás valós időben történik (≈ a film hossza). Tartsd az előtérben a lapot, és a képernyőt bekapcsolva: ha a lap rejtett, az exportálás magától megszakad. A „teljes” formátum (3840×1080) erős számítógépet igényel. Az eredmény MP4, ha a böngésző engedi, különben WebM.", "lang": "Nyelv", "noGL": "A WebGL nem érhető el ebben a böngészőben.", "cTitle": "VOYAGER 1 és 2", "cL1": "Képek: NASA/JPL-Caltech és nyilvános archívumok", "cL2": "1977-ben indított küldetés · 2026-ban is aktív", "cL3": "Vágás és 3D SBS: ODISEEA", "cL4": "Határok nélkül · trade-free", "cFoot": "A teljes közreműködői lista: a kiexportált fájlban", "fxFail": "A fraktálgenerátor hibázott ({0}). Egyszerű rajzokat használok.", "imgProg": "Képek: {0}/{1} · {2}", "imgDone": "Kész: {0} kép nyilvános/saját forrásból, {1} helyben generálva. Cseréld le őket a „másik kép”, „saját kép” vagy „Saját képek” funkcióval.", "another": "↻ másik kép", "yours": "📁 saját kép", "ownCredit": "Saját kép: {0}", "musLoaded": "Zene betöltve: {0}", "voiceLoaded": "Narráció betöltve: {0}", "noVoice": "Ehhez a nyelvhez nincs hang ebben a böngészőben; a szintetikus hang ki van kapcsolva (idegen akcentussal olvasna).", "expCancel": "Exportálás megszakítva.", "expHidden": "Exportálás megszakítva: a lap rejtett volt (képkockák vesztek volna el). Indítsd újra az előtérben tartott lappal.", "expErr": "Exportálási hiba: {0}", "noRec": "A böngésző nem tud videót rögzíteni (MediaRecorder).", "recording": "Rögzítés ({0}) · tartsd nyitva a lapot · {1}", "saved": "Mentve: {0}", "allSaved": "Mind a három fájl mentve.", "ownPlaced": "{0} saját kép elhelyezve a jeleneteken, fájlnév szerinti sorrendben ({1} hely). A „Képek betöltése” a többit kiegészíti, a sajátjaidhoz nem nyúl.", "fxProg": "Fraktáltextúrák {0}/{1} · {2}", "fxDone": "Fraktáltextúrák újragenerálva: {0}.", "hint": "Nyomd meg a „Képek betöltése” vagy közvetlenül a „Lejátszás” gombot (helyben generált képekkel, ha a hálózat nem válaszol).", "crH": "KÉPEK KÖZREMŰKÖDŐI · ODISEEA (Voyager 1 és 2)", "crN1": "Közzététel előtt ellenőrizd minden kép forrásmegjelölését; a NASA anyagai általában szerzői jogtól mentesek, kivételekkel.", "crN2": "A „generált” jelölésű képek helyben létrehozott procedurális (fraktál) illusztrációk, nem fényképek.", "crN3": " Egyes NASA-fotók fekete részeihez művészi fraktál csillagos hátteret adtunk (nem valódi kép).", "crNone": "(helyben generált kép, fraktál)", "crBg": " [művészi csillagos háttér hozzáadva]", "scH": "NARRÁCIÓ · ODISEEA (Voyager 1 és 2)", "scN": "Olvasd fel a szöveget a jelzett ütemben, és töltsd fel a felvételt a „Felvett narráció” mezőbe.", "srcGen": "generált", "srcLocal": "helyi"}};
+const SCNL={"ro": {"titlu": {"label": "VOYAGER", "text": "În vara anului 1977, două sonde cât un autoturism au părăsit Pământul. Nimeni nu știa atunci că ele vor deveni cele mai îndepărtate obiecte construite vreodată de oameni.", "sub": "Mesagerii spre stele"}, "lansare": {"label": "Lansarea · 1977", "text": "Voyager 2 a fost lansată pe 20 august, iar Voyager 1 pe 5 septembrie 1977, de la Cape Canaveral, cu rachete Titan–Centaur. Voyager 1 a primit o traiectorie mai rapidă, de aceea a ajuns prima."}, "tur": {"label": "Marele Tur", "text": "Misiunea a profitat de o aliniere rară a planetelor exterioare, care se repetă la aproximativ o sută șaptezeci și șase de ani. Fiecare planetă întâlnită o arunca pe sondă, prin asistență gravitațională, spre următoarea."}, "jupiter": {"label": "Jupiter · 1979", "text": "În 1979, Voyager 1 și apoi Voyager 2 au trecut pe lângă Jupiter. Au dezvăluit o lume de furtuni uriașe și au descoperit un sistem de inele subțiri, necunoscut până atunci."}, "io": {"label": "Io și Europa", "text": "Pe luna Io, imaginile au arătat primii vulcani activi descoperiți în afara Pământului. Pe Europa, o crustă de gheață brăzdată de crăpături, sub care s-ar putea afla un ocean."}, "saturn": {"label": "Saturn · 1980–1981", "text": "În 1980 și 1981, Saturn și-a arătat inelele ca pe mii de brazde fine, cu structuri pe care nimeni nu le anticipase."}, "titan": {"label": "Titan", "text": "Voyager 1 a studiat Titan, singura lună din sistemul solar cu o atmosferă groasă. Trecerea pe lângă Titan a azvârlit-o deasupra planului planetelor, încheindu-i turul planetar."}, "uranus": {"label": "Uranus · 1986", "text": "Doar Voyager 2 și-a continuat drumul. Pe 24 ianuarie 1986 a ajuns la Uranus, o planetă răsturnată pe o parte, a descoperit zece luni noi și a fotografiat de aproape misterioasa Miranda."}, "neptun": {"label": "Neptun · 1989", "text": "Pe 25 august 1989, la Neptun, a fotografiat Marea Pată Întunecată și jeturi asemănătoare unor gheizere de pe luna Triton. Voyager 2 rămâne singura sondă care a vizitat vreodată Uranus și Neptun."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "Pe 14 februarie 1990, la cererea lui Carl Sagan, Voyager 1 a întors camera spre casă. Pământul a apărut ca un punct palid, mai mic de un pixel, prins într-o rază de lumină."}, "familie": {"label": "Portret de familie", "text": "Imaginea făcea parte dintr-un portret de familie al sistemului solar, realizat din șaizeci de cadre. Imediat după aceea, camerele lui Voyager 1 au fost oprite pentru totdeauna."}, "disc": {"label": "Discul de Aur", "text": "Fiecare sondă poartă un disc de aur, conceput de un comitet condus de Carl Sagan. Conține o sută cincisprezece imagini, saluturi în cincizeci și cinci de limbi, sunetele Pământului și o oră și jumătate de muzică."}, "coperta": {"label": "Scrisoare cosmică", "text": "Pe copertă, o hartă a pulsarilor indică locul Soarelui, iar instrucțiunile gravate explică cum se redă discul. Este o scrisoare pentru oricine ar putea s-o găsească, peste miliarde de ani."}, "heliopauza": {"label": "Spațiul interstelar", "text": "Pe 25 august 2012, Voyager 1 a trecut de heliopauză și a intrat în spațiul interstelar. Voyager 2 a făcut același pas pe 5 noiembrie 2018, iar măsurătorile lor au schimbat felul în care înțelegem bula solară."}, "energie": {"label": "Supraviețuirea", "text": "Sondele funcționează cu generatoare cu plutoniu, care pierd energie în fiecare an. Computerele lor au mai puțin de șaptezeci de kiloocteți de memorie, iar inginerii opresc pe rând instrumentele ca să le țină în viață."}, "dsn": {"label": "Rețeaua Spațială Profundă", "text": "Semnalul lor, de ordinul a douăzeci de wați, călătorește aproape o zi până la noi și este prins de antenele Rețelei Spațiale Profunde. În 2024, echipa a reparat de la peste douăzeci de miliarde de kilometri o defecțiune a memoriei lui Voyager 1."}, "zi": {"label": "O zi-lumină · noiembrie 2026", "text": "În noiembrie 2026, Voyager 1 ajunge la o zi-lumină de Pământ, adică aproximativ douăzeci și șase de miliarde de kilometri. O comandă trimisă acum primește răspuns abia peste două zile."}, "viitor": {"label": "Peste 40.000 de ani", "text": "Peste aproximativ patruzeci de mii de ani, cele două sonde vor trece la câțiva ani-lumină de alte stele. Vor continua să orbiteze centrul Căii Lactee, mult după ce vor tăcea."}, "final": {"label": "Voyager", "text": "Voyager nu este doar o misiune științifică. Este dovada că o specie curioasă poate trimite dincolo de propria stea un mesaj: am fost aici, am privit și am vrut să înțelegem."}, "credite": {"label": "Credite", "text": ""}}, "en": {"titlu": {"label": "VOYAGER", "text": "In the summer of 1977, two probes the size of a car left Earth. No one knew then that they would become the most distant objects ever built by humans.", "sub": "Messengers to the stars"}, "lansare": {"label": "Launch · 1977", "text": "Voyager 2 was launched on 20 August and Voyager 1 on 5 September 1977 from Cape Canaveral, on Titan–Centaur rockets. Voyager 1 was given a faster trajectory, which is why it arrived first."}, "tur": {"label": "The Grand Tour", "text": "The mission took advantage of a rare alignment of the outer planets, which recurs about every one hundred and seventy-six years. Each planet it met flung the probe onward, through gravity assist, toward the next."}, "jupiter": {"label": "Jupiter · 1979", "text": "In 1979, Voyager 1 and then Voyager 2 flew past Jupiter. They revealed a world of giant storms and discovered a thin ring system, unknown until then."}, "io": {"label": "Io and Europa", "text": "On the moon Io, the images showed the first active volcanoes ever discovered outside Earth. On Europa, a crust of ice crisscrossed by cracks, beneath which an ocean might lie."}, "saturn": {"label": "Saturn · 1980–1981", "text": "In 1980 and 1981, Saturn showed its rings as thousands of fine grooves, with structures no one had anticipated."}, "titan": {"label": "Titan", "text": "Voyager 1 studied Titan, the only moon in the solar system with a thick atmosphere. The flyby of Titan threw it above the plane of the planets, ending its planetary tour."}, "uranus": {"label": "Uranus · 1986", "text": "Only Voyager 2 continued its journey. On 24 January 1986 it reached Uranus, a planet knocked over on its side, discovered ten new moons and photographed the mysterious Miranda up close."}, "neptun": {"label": "Neptune · 1989", "text": "On 25 August 1989, at Neptune, it photographed the Great Dark Spot and geyser-like jets on the moon Triton. Voyager 2 remains the only probe ever to have visited Uranus and Neptune."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "On 14 February 1990, at Carl Sagan's request, Voyager 1 turned its camera back toward home. Earth appeared as a pale point, smaller than a pixel, caught in a ray of light."}, "familie": {"label": "Family Portrait", "text": "The image was part of a family portrait of the solar system, made of sixty frames. Right afterwards, Voyager 1's cameras were switched off for good."}, "disc": {"label": "The Golden Record", "text": "Each probe carries a golden record, designed by a committee chaired by Carl Sagan. It holds one hundred and fifteen images, greetings in fifty-five languages, the sounds of Earth and an hour and a half of music."}, "coperta": {"label": "Cosmic Letter", "text": "On the cover, a pulsar map shows the Sun's location, and engraved instructions explain how to play the record. It is a letter to anyone who might find it, billions of years from now."}, "heliopauza": {"label": "Interstellar Space", "text": "On 25 August 2012, Voyager 1 crossed the heliopause and entered interstellar space. Voyager 2 made the same step on 5 November 2018, and their measurements changed how we understand the solar bubble."}, "energie": {"label": "Survival", "text": "The probes run on plutonium generators, which lose power every year. Their computers have less than seventy kilobytes of memory, and engineers switch off instruments one by one to keep them alive."}, "dsn": {"label": "The Deep Space Network", "text": "Their signal, of the order of twenty watts, travels almost a day to reach us and is caught by the antennas of the Deep Space Network. In 2024, the team repaired a memory fault on Voyager 1 from more than twenty billion kilometres away."}, "zi": {"label": "One light-day · November 2026", "text": "In November 2026, Voyager 1 reaches one light-day from Earth, roughly twenty-six billion kilometres. A command sent now gets a reply only two days later."}, "viitor": {"label": "In 40,000 years", "text": "In about forty thousand years, the two probes will pass within a few light-years of other stars. They will keep orbiting the centre of the Milky Way, long after they have fallen silent."}, "final": {"label": "Voyager", "text": "Voyager is not only a scientific mission. It is proof that a curious species can send a message beyond its own star: we were here, we looked, and we wanted to understand."}, "credite": {"label": "Credits", "text": ""}}, "fr": {"titlu": {"label": "VOYAGER", "text": "À l'été 1977, deux sondes de la taille d'une voiture ont quitté la Terre. Personne ne savait alors qu'elles deviendraient les objets les plus lointains jamais construits par l'humanité.", "sub": "Messagers vers les étoiles"}, "lansare": {"label": "Lancement · 1977", "text": "Voyager 2 a été lancée le 20 août et Voyager 1 le 5 septembre 1977, depuis Cap Canaveral, par des fusées Titan–Centaur. Voyager 1 a reçu une trajectoire plus rapide, ce qui explique qu'elle soit arrivée la première."}, "tur": {"label": "Le Grand Tour", "text": "La mission a profité d'un alignement rare des planètes extérieures, qui se reproduit environ tous les cent soixante-seize ans. Chaque planète rencontrée propulsait la sonde, par assistance gravitationnelle, vers la suivante."}, "jupiter": {"label": "Jupiter · 1979", "text": "En 1979, Voyager 1 puis Voyager 2 ont survolé Jupiter. Elles ont révélé un monde de tempêtes géantes et découvert un système d'anneaux ténus, inconnu jusque-là."}, "io": {"label": "Io et Europe", "text": "Sur la lune Io, les images ont montré les premiers volcans actifs découverts hors de la Terre. Sur Europe, une croûte de glace sillonnée de fissures, sous laquelle pourrait se cacher un océan."}, "saturn": {"label": "Saturne · 1980–1981", "text": "En 1980 et 1981, Saturne a montré ses anneaux sous la forme de milliers de sillons fins, avec des structures que personne n'avait prévues."}, "titan": {"label": "Titan", "text": "Voyager 1 a étudié Titan, la seule lune du système solaire dotée d'une atmosphère épaisse. Le survol de Titan l'a projetée au-dessus du plan des planètes, mettant fin à son tour planétaire."}, "uranus": {"label": "Uranus · 1986", "text": "Seule Voyager 2 a poursuivi sa route. Le 24 janvier 1986, elle a atteint Uranus, une planète couchée sur le côté, a découvert dix nouvelles lunes et photographié de près la mystérieuse Miranda."}, "neptun": {"label": "Neptune · 1989", "text": "Le 25 août 1989, à Neptune, elle a photographié la Grande Tache sombre et des jets semblables à des geysers sur la lune Triton. Voyager 2 reste la seule sonde à avoir visité Uranus et Neptune."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "Le 14 février 1990, à la demande de Carl Sagan, Voyager 1 a tourné son appareil vers la maison. La Terre est apparue comme un point pâle, plus petit qu'un pixel, pris dans un rayon de lumière."}, "familie": {"label": "Portrait de famille", "text": "L'image faisait partie d'un portrait de famille du système solaire, composé de soixante clichés. Juste après, les caméras de Voyager 1 ont été éteintes pour toujours."}, "disc": {"label": "Le Disque d'or", "text": "Chaque sonde emporte un disque d'or, conçu par un comité présidé par Carl Sagan. Il contient cent quinze images, des salutations en cinquante-cinq langues, les sons de la Terre et une heure et demie de musique."}, "coperta": {"label": "Lettre cosmique", "text": "Sur la pochette, une carte de pulsars indique la position du Soleil, et des instructions gravées expliquent comment lire le disque. C'est une lettre pour quiconque pourrait la trouver, dans des milliards d'années."}, "heliopauza": {"label": "L'espace interstellaire", "text": "Le 25 août 2012, Voyager 1 a franchi l'héliopause et pénétré dans l'espace interstellaire. Voyager 2 a fait le même pas le 5 novembre 2018, et leurs mesures ont changé notre compréhension de la bulle solaire."}, "energie": {"label": "La survie", "text": "Les sondes fonctionnent grâce à des générateurs au plutonium, dont la puissance diminue chaque année. Leurs ordinateurs ont moins de soixante-dix kilo-octets de mémoire, et les ingénieurs éteignent les instruments un à un pour les maintenir en vie."}, "dsn": {"label": "Le Deep Space Network", "text": "Leur signal, de l'ordre de vingt watts, voyage presque une journée jusqu'à nous et est capté par les antennes du Deep Space Network. En 2024, l'équipe a réparé depuis plus de vingt milliards de kilomètres une panne de mémoire de Voyager 1."}, "zi": {"label": "Un jour-lumière · novembre 2026", "text": "En novembre 2026, Voyager 1 atteint un jour-lumière de la Terre, soit environ vingt-six milliards de kilomètres. Une commande envoyée aujourd'hui ne reçoit de réponse que deux jours plus tard."}, "viitor": {"label": "Dans 40 000 ans", "text": "Dans environ quarante mille ans, les deux sondes passeront à quelques années-lumière d'autres étoiles. Elles continueront de tourner autour du centre de la Voie lactée, longtemps après s'être tues."}, "final": {"label": "Voyager", "text": "Voyager n'est pas seulement une mission scientifique. C'est la preuve qu'une espèce curieuse peut envoyer au-delà de sa propre étoile un message : nous étions là, nous avons regardé et nous avons voulu comprendre."}, "credite": {"label": "Crédits", "text": ""}}, "it": {"titlu": {"label": "VOYAGER", "text": "Nell'estate del 1977, due sonde grandi quanto un'automobile lasciarono la Terra. Nessuno sapeva allora che sarebbero diventate gli oggetti più lontani mai costruiti dall'uomo.", "sub": "Messaggeri verso le stelle"}, "lansare": {"label": "Lancio · 1977", "text": "Voyager 2 fu lanciata il 20 agosto e Voyager 1 il 5 settembre 1977 da Cape Canaveral, con razzi Titan–Centaur. Voyager 1 ricevette una traiettoria più veloce, ed è per questo che arrivò per prima."}, "tur": {"label": "Il Grand Tour", "text": "La missione sfruttò un raro allineamento dei pianeti esterni, che si ripete circa ogni centosettantasei anni. Ogni pianeta incontrato lanciava la sonda, per assistenza gravitazionale, verso il successivo."}, "jupiter": {"label": "Giove · 1979", "text": "Nel 1979, Voyager 1 e poi Voyager 2 sorvolarono Giove. Rivelarono un mondo di tempeste gigantesche e scoprirono un sottile sistema di anelli, fino ad allora sconosciuto."}, "io": {"label": "Io ed Europa", "text": "Sulla luna Io, le immagini mostrarono i primi vulcani attivi scoperti fuori dalla Terra. Su Europa, una crosta di ghiaccio solcata da crepe, sotto la quale potrebbe nascondersi un oceano."}, "saturn": {"label": "Saturno · 1980–1981", "text": "Nel 1980 e nel 1981, Saturno mostrò i suoi anelli come migliaia di solchi sottili, con strutture che nessuno aveva previsto."}, "titan": {"label": "Titano", "text": "Voyager 1 studiò Titano, l'unica luna del sistema solare con un'atmosfera densa. Il passaggio vicino a Titano la scagliò sopra il piano dei pianeti, ponendo fine al suo tour planetario."}, "uranus": {"label": "Urano · 1986", "text": "Solo Voyager 2 proseguì il viaggio. Il 24 gennaio 1986 raggiunse Urano, un pianeta rovesciato su un fianco, scoprì dieci nuove lune e fotografò da vicino la misteriosa Miranda."}, "neptun": {"label": "Nettuno · 1989", "text": "Il 25 agosto 1989, a Nettuno, fotografò la Grande Macchia Scura e getti simili a geyser sulla luna Tritone. Voyager 2 resta l'unica sonda ad aver visitato Urano e Nettuno."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "Il 14 febbraio 1990, su richiesta di Carl Sagan, Voyager 1 rivolse la fotocamera verso casa. La Terra apparve come un punto pallido, più piccolo di un pixel, catturato in un raggio di luce."}, "familie": {"label": "Ritratto di famiglia", "text": "L'immagine faceva parte di un ritratto di famiglia del sistema solare, composto da sessanta fotogrammi. Subito dopo, le telecamere di Voyager 1 furono spente per sempre."}, "disc": {"label": "Il Disco d'oro", "text": "Ogni sonda porta un disco d'oro, ideato da un comitato guidato da Carl Sagan. Contiene centoquindici immagini, saluti in cinquantacinque lingue, i suoni della Terra e un'ora e mezza di musica."}, "coperta": {"label": "Lettera cosmica", "text": "Sulla copertina, una mappa delle pulsar indica la posizione del Sole, e istruzioni incise spiegano come riprodurre il disco. È una lettera per chiunque potrebbe trovarla, tra miliardi di anni."}, "heliopauza": {"label": "Lo spazio interstellare", "text": "Il 25 agosto 2012, Voyager 1 attraversò l'eliopausa ed entrò nello spazio interstellare. Voyager 2 compì lo stesso passo il 5 novembre 2018, e le loro misurazioni hanno cambiato il modo in cui comprendiamo la bolla solare."}, "energie": {"label": "La sopravvivenza", "text": "Le sonde funzionano con generatori al plutonio, che perdono potenza ogni anno. I loro computer hanno meno di settanta kilobyte di memoria, e gli ingegneri spengono gli strumenti uno a uno per mantenerle in vita."}, "dsn": {"label": "La Deep Space Network", "text": "Il loro segnale, dell'ordine di venti watt, viaggia per quasi un giorno fino a noi ed è captato dalle antenne della Deep Space Network. Nel 2024, il team ha riparato da oltre venti miliardi di chilometri un guasto alla memoria di Voyager 1."}, "zi": {"label": "Un giorno-luce · novembre 2026", "text": "A novembre 2026, Voyager 1 raggiunge un giorno-luce dalla Terra, circa ventisei miliardi di chilometri. Un comando inviato oggi riceve risposta solo due giorni dopo."}, "viitor": {"label": "Tra 40.000 anni", "text": "Tra circa quarantamila anni, le due sonde passeranno a pochi anni-luce da altre stelle. Continueranno a orbitare attorno al centro della Via Lattea, molto dopo essere ammutolite."}, "final": {"label": "Voyager", "text": "Voyager non è soltanto una missione scientifica. È la prova che una specie curiosa può inviare oltre la propria stella un messaggio: siamo stati qui, abbiamo guardato e abbiamo voluto capire."}, "credite": {"label": "Crediti", "text": ""}}, "es": {"titlu": {"label": "VOYAGER", "text": "En el verano de 1977, dos sondas del tamaño de un automóvil abandonaron la Tierra. Nadie sabía entonces que se convertirían en los objetos más lejanos jamás construidos por el ser humano.", "sub": "Mensajeros hacia las estrellas"}, "lansare": {"label": "Lanzamiento · 1977", "text": "Voyager 2 fue lanzada el 20 de agosto y Voyager 1 el 5 de septiembre de 1977 desde Cabo Cañaveral, con cohetes Titan–Centaur. Voyager 1 recibió una trayectoria más rápida, por eso llegó primero."}, "tur": {"label": "El Gran Tour", "text": "La misión aprovechó una alineación poco frecuente de los planetas exteriores, que se repite aproximadamente cada ciento setenta y seis años. Cada planeta que encontraba lanzaba la sonda, mediante asistencia gravitatoria, hacia el siguiente."}, "jupiter": {"label": "Júpiter · 1979", "text": "En 1979, Voyager 1 y después Voyager 2 pasaron junto a Júpiter. Revelaron un mundo de tormentas gigantescas y descubrieron un tenue sistema de anillos, desconocido hasta entonces."}, "io": {"label": "Ío y Europa", "text": "En la luna Ío, las imágenes mostraron los primeros volcanes activos descubiertos fuera de la Tierra. En Europa, una corteza de hielo surcada de grietas, bajo la cual podría haber un océano."}, "saturn": {"label": "Saturno · 1980–1981", "text": "En 1980 y 1981, Saturno mostró sus anillos como miles de surcos finos, con estructuras que nadie había previsto."}, "titan": {"label": "Titán", "text": "Voyager 1 estudió Titán, la única luna del sistema solar con una atmósfera densa. El paso junto a Titán la lanzó por encima del plano de los planetas, poniendo fin a su recorrido planetario."}, "uranus": {"label": "Urano · 1986", "text": "Solo Voyager 2 continuó su camino. El 24 de enero de 1986 llegó a Urano, un planeta volcado de lado, descubrió diez lunas nuevas y fotografió de cerca la misteriosa Miranda."}, "neptun": {"label": "Neptuno · 1989", "text": "El 25 de agosto de 1989, en Neptuno, fotografió la Gran Mancha Oscura y chorros parecidos a géiseres en la luna Tritón. Voyager 2 sigue siendo la única sonda que ha visitado Urano y Neptuno."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "El 14 de febrero de 1990, a petición de Carl Sagan, Voyager 1 volvió su cámara hacia casa. La Tierra apareció como un punto pálido, menor que un píxel, atrapado en un rayo de luz."}, "familie": {"label": "Retrato de familia", "text": "La imagen formaba parte de un retrato de familia del sistema solar, compuesto por sesenta fotogramas. Poco después, las cámaras de Voyager 1 se apagaron para siempre."}, "disc": {"label": "El Disco de Oro", "text": "Cada sonda lleva un disco de oro, concebido por un comité presidido por Carl Sagan. Contiene ciento quince imágenes, saludos en cincuenta y cinco idiomas, los sonidos de la Tierra y una hora y media de música."}, "coperta": {"label": "Carta cósmica", "text": "En la cubierta, un mapa de púlsares indica la posición del Sol, y unas instrucciones grabadas explican cómo reproducir el disco. Es una carta para quien pueda encontrarla, dentro de miles de millones de años."}, "heliopauza": {"label": "El espacio interestelar", "text": "El 25 de agosto de 2012, Voyager 1 cruzó la heliopausa y entró en el espacio interestelar. Voyager 2 dio el mismo paso el 5 de noviembre de 2018, y sus mediciones cambiaron la forma en que entendemos la burbuja solar."}, "energie": {"label": "La supervivencia", "text": "Las sondas funcionan con generadores de plutonio, que pierden potencia cada año. Sus ordenadores tienen menos de setenta kilobytes de memoria, y los ingenieros apagan los instrumentos uno a uno para mantenerlas con vida."}, "dsn": {"label": "La Red del Espacio Profundo", "text": "Su señal, del orden de veinte vatios, tarda casi un día en llegar hasta nosotros y es captada por las antenas de la Red del Espacio Profundo. En 2024, el equipo reparó desde más de veinte mil millones de kilómetros un fallo de memoria de Voyager 1."}, "zi": {"label": "Un día-luz · noviembre de 2026", "text": "En noviembre de 2026, Voyager 1 llega a un día-luz de la Tierra, unos veintiséis mil millones de kilómetros. Una orden enviada hoy recibe respuesta solo dos días después."}, "viitor": {"label": "Dentro de 40.000 años", "text": "Dentro de unos cuarenta mil años, las dos sondas pasarán a pocos años-luz de otras estrellas. Seguirán orbitando el centro de la Vía Láctea, mucho después de haber enmudecido."}, "final": {"label": "Voyager", "text": "Voyager no es solo una misión científica. Es la prueba de que una especie curiosa puede enviar más allá de su propia estrella un mensaje: estuvimos aquí, miramos y quisimos comprender."}, "credite": {"label": "Créditos", "text": ""}}, "pt": {"titlu": {"label": "VOYAGER", "text": "No verão de 1977, duas sondas do tamanho de um automóvel deixaram a Terra. Ninguém sabia então que se tornariam os objetos mais distantes alguma vez construídos pelo ser humano.", "sub": "Mensageiras rumo às estrelas"}, "lansare": {"label": "Lançamento · 1977", "text": "A Voyager 2 foi lançada a 20 de agosto e a Voyager 1 a 5 de setembro de 1977, a partir de Cabo Canaveral, com foguetões Titan–Centaur. A Voyager 1 recebeu uma trajetória mais rápida, por isso chegou primeiro."}, "tur": {"label": "O Grand Tour", "text": "A missão aproveitou um raro alinhamento dos planetas exteriores, que se repete aproximadamente de cento e setenta e seis em cento e setenta e seis anos. Cada planeta encontrado lançava a sonda, por assistência gravitacional, em direção ao seguinte."}, "jupiter": {"label": "Júpiter · 1979", "text": "Em 1979, a Voyager 1 e depois a Voyager 2 passaram por Júpiter. Revelaram um mundo de tempestades gigantescas e descobriram um tênue sistema de anéis, até então desconhecido."}, "io": {"label": "Io e Europa", "text": "Na lua Io, as imagens mostraram os primeiros vulcões ativos descobertos fora da Terra. Em Europa, uma crosta de gelo sulcada de fendas, sob a qual poderá existir um oceano."}, "saturn": {"label": "Saturno · 1980–1981", "text": "Em 1980 e 1981, Saturno mostrou os seus anéis como milhares de sulcos finos, com estruturas que ninguém previra."}, "titan": {"label": "Titã", "text": "A Voyager 1 estudou Titã, a única lua do sistema solar com uma atmosfera densa. A passagem junto a Titã lançou-a para cima do plano dos planetas, pondo fim ao seu percurso planetário."}, "uranus": {"label": "Urano · 1986", "text": "Só a Voyager 2 prosseguiu a viagem. A 24 de janeiro de 1986 chegou a Urano, um planeta tombado de lado, descobriu dez luas novas e fotografou de perto a misteriosa Miranda."}, "neptun": {"label": "Neptuno · 1989", "text": "A 25 de agosto de 1989, em Neptuno, fotografou a Grande Mancha Escura e jatos semelhantes a géisers na lua Tritão. A Voyager 2 continua a ser a única sonda que visitou Urano e Neptuno."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "A 14 de fevereiro de 1990, a pedido de Carl Sagan, a Voyager 1 virou a câmara para casa. A Terra surgiu como um ponto pálido, menor do que um píxel, preso num raio de luz."}, "familie": {"label": "Retrato de família", "text": "A imagem fazia parte de um retrato de família do sistema solar, composto por sessenta fotogramas. Logo depois, as câmaras da Voyager 1 foram desligadas para sempre."}, "disc": {"label": "O Disco de Ouro", "text": "Cada sonda leva um disco de ouro, concebido por uma comissão presidida por Carl Sagan. Contém cento e quinze imagens, saudações em cinquenta e cinco línguas, os sons da Terra e hora e meia de música."}, "coperta": {"label": "Carta cósmica", "text": "Na capa, um mapa de pulsares indica a posição do Sol, e instruções gravadas explicam como reproduzir o disco. É uma carta para quem a possa encontrar, daqui a milhares de milhões de anos."}, "heliopauza": {"label": "O espaço interestelar", "text": "A 25 de agosto de 2012, a Voyager 1 atravessou a heliopausa e entrou no espaço interestelar. A Voyager 2 deu o mesmo passo a 5 de novembro de 2018, e as suas medições mudaram a forma como entendemos a bolha solar."}, "energie": {"label": "A sobrevivência", "text": "As sondas funcionam com geradores de plutónio, que perdem potência todos os anos. Os seus computadores têm menos de setenta quilobytes de memória, e os engenheiros desligam os instrumentos um a um para as manter vivas."}, "dsn": {"label": "A Rede do Espaço Profundo", "text": "O seu sinal, da ordem dos vinte watts, demora quase um dia a chegar até nós e é captado pelas antenas da Rede do Espaço Profundo. Em 2024, a equipa reparou, a mais de vinte mil milhões de quilómetros, uma falha de memória da Voyager 1."}, "zi": {"label": "Um dia-luz · novembro de 2026", "text": "Em novembro de 2026, a Voyager 1 chega a um dia-luz da Terra, cerca de vinte e seis mil milhões de quilómetros. Um comando enviado hoje só recebe resposta dois dias depois."}, "viitor": {"label": "Daqui a 40 000 anos", "text": "Daqui a cerca de quarenta mil anos, as duas sondas passarão a poucos anos-luz de outras estrelas. Continuarão a orbitar o centro da Via Láctea, muito depois de terem emudecido."}, "final": {"label": "Voyager", "text": "A Voyager não é apenas uma missão científica. É a prova de que uma espécie curiosa pode enviar, para além da sua própria estrela, uma mensagem: estivemos aqui, olhámos e quisemos compreender."}, "credite": {"label": "Créditos", "text": ""}}, "de": {"titlu": {"label": "VOYAGER", "text": "Im Sommer 1977 verließen zwei Sonden von der Größe eines Autos die Erde. Niemand ahnte damals, dass sie zu den am weitesten entfernten Objekten werden würden, die Menschen je gebaut haben.", "sub": "Boten zu den Sternen"}, "lansare": {"label": "Start · 1977", "text": "Voyager 2 wurde am 20. August und Voyager 1 am 5. September 1977 von Cape Canaveral aus mit Titan-Centaur-Raketen gestartet. Voyager 1 erhielt eine schnellere Bahn, deshalb kam sie zuerst an."}, "tur": {"label": "Die Grand Tour", "text": "Die Mission nutzte eine seltene Ausrichtung der äußeren Planeten, die sich etwa alle einhundertsechsundsiebzig Jahre wiederholt. Jeder Planet, den sie traf, schleuderte die Sonde per Swing-by zum nächsten."}, "jupiter": {"label": "Jupiter · 1979", "text": "1979 flogen Voyager 1 und danach Voyager 2 an Jupiter vorbei. Sie enthüllten eine Welt riesiger Stürme und entdeckten ein dünnes Ringsystem, das bis dahin unbekannt war."}, "io": {"label": "Io und Europa", "text": "Auf dem Mond Io zeigten die Bilder die ersten aktiven Vulkane, die außerhalb der Erde entdeckt wurden. Auf Europa eine von Rissen durchzogene Eiskruste, unter der ein Ozean liegen könnte."}, "saturn": {"label": "Saturn · 1980–1981", "text": "1980 und 1981 zeigte Saturn seine Ringe als Tausende feiner Rillen, mit Strukturen, die niemand erwartet hatte."}, "titan": {"label": "Titan", "text": "Voyager 1 untersuchte Titan, den einzigen Mond des Sonnensystems mit dichter Atmosphäre. Der Vorbeiflug an Titan schleuderte sie über die Ebene der Planeten hinaus und beendete ihre Planetentour."}, "uranus": {"label": "Uranus · 1986", "text": "Nur Voyager 2 setzte die Reise fort. Am 24. Januar 1986 erreichte sie Uranus, einen auf die Seite gekippten Planeten, entdeckte zehn neue Monde und fotografierte den geheimnisvollen Mond Miranda aus der Nähe."}, "neptun": {"label": "Neptun · 1989", "text": "Am 25. August 1989 fotografierte sie bei Neptun den Großen Dunklen Fleck und geysirartige Fontänen auf dem Mond Triton. Voyager 2 bleibt die einzige Sonde, die Uranus und Neptun besucht hat."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "Am 14. Februar 1990 richtete Voyager 1 auf Wunsch von Carl Sagan ihre Kamera zurück nach Hause. Die Erde erschien als blasser Punkt, kleiner als ein Pixel, gefangen in einem Lichtstrahl."}, "familie": {"label": "Familienporträt", "text": "Das Bild gehörte zu einem Familienporträt des Sonnensystems aus sechzig Aufnahmen. Unmittelbar danach wurden die Kameras von Voyager 1 für immer abgeschaltet."}, "disc": {"label": "Die Goldene Schallplatte", "text": "Jede Sonde trägt eine goldene Schallplatte, entworfen von einem Komitee unter dem Vorsitz von Carl Sagan. Sie enthält einhundertfünfzehn Bilder, Grüße in fünfundfünfzig Sprachen, die Klänge der Erde und anderthalb Stunden Musik."}, "coperta": {"label": "Kosmischer Brief", "text": "Auf der Hülle zeigt eine Pulsarkarte den Ort der Sonne, und eingravierte Anleitungen erklären, wie die Platte abzuspielen ist. Es ist ein Brief an alle, die ihn in Milliarden von Jahren finden könnten."}, "heliopauza": {"label": "Der interstellare Raum", "text": "Am 25. August 2012 durchquerte Voyager 1 die Heliopause und trat in den interstellaren Raum ein. Voyager 2 vollzog denselben Schritt am 5. November 2018, und ihre Messungen veränderten unser Verständnis der Sonnenblase."}, "energie": {"label": "Das Überleben", "text": "Die Sonden werden von Plutoniumgeneratoren versorgt, deren Leistung jedes Jahr abnimmt. Ihre Computer haben weniger als siebzig Kilobyte Speicher, und die Ingenieure schalten Instrumente nacheinander ab, um sie am Leben zu halten."}, "dsn": {"label": "Das Deep Space Network", "text": "Ihr Signal, in der Größenordnung von zwanzig Watt, braucht fast einen Tag bis zu uns und wird von den Antennen des Deep Space Network aufgefangen. 2024 reparierte das Team aus mehr als zwanzig Milliarden Kilometern Entfernung einen Speicherfehler von Voyager 1."}, "zi": {"label": "Ein Lichttag · November 2026", "text": "Im November 2026 erreicht Voyager 1 einen Lichttag Entfernung von der Erde, etwa sechsundzwanzig Milliarden Kilometer. Ein heute gesendeter Befehl wird erst zwei Tage später beantwortet."}, "viitor": {"label": "In 40.000 Jahren", "text": "In etwa vierzigtausend Jahren werden die beiden Sonden in wenigen Lichtjahren Abstand an anderen Sternen vorbeiziehen. Sie werden das Zentrum der Milchstraße weiter umkreisen, lange nachdem sie verstummt sind."}, "final": {"label": "Voyager", "text": "Voyager ist nicht nur eine wissenschaftliche Mission. Sie ist der Beweis, dass eine neugierige Art über den eigenen Stern hinaus eine Botschaft senden kann: Wir waren hier, wir haben geschaut, und wir wollten verstehen."}, "credite": {"label": "Credits", "text": ""}}, "hu": {"titlu": {"label": "VOYAGER", "text": "1977 nyarán két autó méretű szonda hagyta el a Földet. Akkor még senki sem sejtette, hogy az ember által valaha épített legtávolabbi tárgyakká válnak.", "sub": "Hírnökök a csillagok felé"}, "lansare": {"label": "Indítás · 1977", "text": "A Voyager 2-t augusztus 20-án, a Voyager 1-et 1977. szeptember 5-én indították útnak a Cape Canaveral-ról, Titan–Centaur rakétákkal. A Voyager 1 gyorsabb pályát kapott, ezért ért oda előbb."}, "tur": {"label": "A Grand Tour", "text": "A küldetés kihasználta a külső bolygók ritka együttállását, amely nagyjából százhetvenhat évente ismétlődik. Minden bolygó, amellyel találkozott, gravitációs hintamanőverrel lökte tovább a szondát a következő felé."}, "jupiter": {"label": "Jupiter · 1979", "text": "1979-ben a Voyager 1, majd a Voyager 2 elhaladt a Jupiter mellett. Óriási viharok világát tárták fel, és felfedeztek egy addig ismeretlen, vékony gyűrűrendszert."}, "io": {"label": "Io és Európa", "text": "Az Io holdon a felvételek az első, a Földön kívül felfedezett aktív vulkánokat mutatták. Az Európán repedésekkel szabdalt jégkéreg látszott, amely alatt óceán rejtőzhet."}, "saturn": {"label": "Szaturnusz · 1980–1981", "text": "1980-ban és 1981-ben a Szaturnusz gyűrűit vékony barázdák ezreiként mutatta meg, olyan szerkezetekkel, amelyeket senki sem várt."}, "titan": {"label": "Titán", "text": "A Voyager 1 a Titánt tanulmányozta, a Naprendszer egyetlen vastag légkörű holdját. A Titán melletti elhaladás a bolygók síkja fölé lökte, ezzel véget ért bolygókörútja."}, "uranus": {"label": "Uránusz · 1986", "text": "Csak a Voyager 2 folytatta útját. 1986. január 24-én elérte az Uránuszt, az oldalára dőlt bolygót, tíz új holdat fedezett fel, és közelről lefényképezte a titokzatos Mirandát."}, "neptun": {"label": "Neptunusz · 1989", "text": "1989. augusztus 25-én a Neptunusznál lefényképezte a Nagy Sötét Foltot és a Triton holdon a gejzírekre emlékeztető kitöréseket. A Voyager 2 az egyetlen szonda, amely valaha meglátogatta az Uránuszt és a Neptunuszt."}, "pbd": {"label": "Pale Blue Dot · 1990", "text": "1990. február 14-én Carl Sagan kérésére a Voyager 1 hazafelé fordította a kameráját. A Föld halvány pontként jelent meg, egy pixelnél kisebben, egy fénysugárban elkapva."}, "familie": {"label": "Családi portré", "text": "A kép a Naprendszer családi portréjának része volt, amely hatvan felvételből állt. Közvetlenül utána a Voyager 1 kameráit örökre kikapcsolták."}, "disc": {"label": "Az Aranylemez", "text": "Mindegyik szonda egy aranylemezt visz, amelyet a Carl Sagan vezette bizottság tervezett. Száztizenöt képet, ötvenöt nyelven elhangzó üdvözletet, a Föld hangjait és másfél óra zenét tartalmaz."}, "coperta": {"label": "Kozmikus levél", "text": "A borítón egy pulzártérkép jelöli a Nap helyét, a belevésett útmutató pedig elmagyarázza, hogyan kell lejátszani a lemezt. Levél bárkinek, aki milliárd évek múlva megtalálhatja."}, "heliopauza": {"label": "Csillagközi tér", "text": "2012. augusztus 25-én a Voyager 1 átlépte a heliopauzát, és belépett a csillagközi térbe. A Voyager 2 2018. november 5-én tette meg ugyanezt, mérési eredményeik megváltoztatták, hogyan értjük a napbuborékot."}, "energie": {"label": "A túlélés", "text": "A szondák plutóniumgenerátorokkal működnek, amelyek teljesítménye évről évre csökken. Számítógépeik memóriája hetven kilobájtnál is kisebb, a mérnökök pedig egyenként kapcsolják ki a műszereket, hogy életben tartsák őket."}, "dsn": {"label": "A Deep Space Network", "text": "Jelük, nagyságrendileg húsz watt, csaknem egy napig utazik hozzánk, és a Deep Space Network antennái fogják fel. 2024-ben a csapat több mint húszmilliárd kilométerről javította meg a Voyager 1 memóriahibáját."}, "zi": {"label": "Egy fénynap · 2026 novembere", "text": "2026 novemberében a Voyager 1 egy fénynapnyira jár a Földtől, nagyjából huszonhatmilliárd kilométerre. Egy ma elküldött parancsra csak két nap múlva érkezik válasz."}, "viitor": {"label": "40 000 év múlva", "text": "Nagyjából negyvenezer év múlva a két szonda néhány fényévre halad el más csillagoktól. Tovább keringenek a Tejútrendszer középpontja körül, jóval azután, hogy elnémultak."}, "final": {"label": "Voyager", "text": "A Voyager nem csupán tudományos küldetés. Bizonyítéka annak, hogy egy kíváncsi faj saját csillagán túlra is üzenhet: itt voltunk, néztünk, és meg akartuk érteni."}, "credite": {"label": "Közreműködők", "text": ""}}};
+const LANGS=["ro", "en", "fr", "it", "es", "pt", "de", "hu"],TTSL={ro:"ro-RO",en:"en-US",fr:"fr-FR",it:"it-IT",es:"es-ES",pt:"pt-PT",de:"de-DE",hu:"hu-HU"};
+let LANG="en";
+try{const sv=localStorage.getItem("odiseea_lang");if(LANGS.includes(sv))LANG=sv;else{const b=(navigator.language||"en").slice(0,2).toLowerCase();if(LANGS.includes(b))LANG=b;}}catch(e){const b=(navigator.language||"en").slice(0,2).toLowerCase();if(LANGS.includes(b))LANG=b;}
+const t=(k,...a)=>{let x=(L10N[LANG]&&L10N[LANG][k])||L10N.ro[k]||k;a.forEach((v,i)=>{x=x.split("{"+i+"}").join(v);});return x;};
+const srcName=x=>x==="generat"?t("srcGen"):x==="local"?t("srcLocal"):(x||"…");
+const SCN=[
+{id:"titlu",label:"VOYAGER",big:true,sub:"Mesagerii spre stele",q:["Voyager spacecraft"],must:/voyager/i,fb:{t:"probe"},dur:12,
+ text:"În vara anului 1977, două sonde cât un autoturism au părăsit Pământul. Nimeni nu știa atunci că ele vor deveni cele mai îndepărtate obiecte construite vreodată de oameni."},
+{id:"lansare",label:"Lansarea · 1977",q:["Voyager 2 launch Titan Centaur","Voyager launch Cape Canaveral 1977"],must:/voyager|titan|launch/i,fb:{t:"rocket"},dur:13,
+ text:"Voyager 2 a fost lansată pe 20 august, iar Voyager 1 pe 5 septembrie 1977, de la Cape Canaveral, cu rachete Titan–Centaur. Voyager 1 a primit o traiectorie mai rapidă, de aceea a ajuns prima."},
+{id:"tur",label:"Marele Tur",q:["Voyager grand tour trajectory","Voyager mission trajectory planets"],must:/voyager|trajectory|grand tour/i,fb:{t:"trail"},dur:13,
+ text:"Misiunea a profitat de o aliniere rară a planetelor exterioare, care se repetă la aproximativ o sută șaptezeci și șase de ani. Fiecare planetă întâlnită o arunca pe sondă, prin asistență gravitațională, spre următoarea."},
+{id:"jupiter",label:"Jupiter · 1979",q:["Voyager 1 Jupiter","Voyager 2 Jupiter Great Red Spot"],must:/voyager|jupiter/i,fb:{t:"planet",c:[200,150,110],R:240,bands:1},dur:12,
+ text:"În 1979, Voyager 1 și apoi Voyager 2 au trecut pe lângă Jupiter. Au dezvăluit o lume de furtuni uriașe și au descoperit un sistem de inele subțiri, necunoscut până atunci."},
+{id:"io",label:"Io și Europa",q:["Voyager Io volcanic plume","Voyager Europa"],must:/\bio\b|europa|volcan/i,fb:{t:"planet",c:[225,200,90],R:200},dur:12,
+ text:"Pe luna Io, imaginile au arătat primii vulcani activi descoperiți în afara Pământului. Pe Europa, o crustă de gheață brăzdată de crăpături, sub care s-ar putea afla un ocean."},
+{id:"saturn",label:"Saturn · 1980–1981",q:["Voyager Saturn rings","Voyager 2 Saturn"],must:/voyager|saturn/i,fb:{t:"planet",c:[220,195,140],R:170,ring:1,bands:1},dur:11,
+ text:"În 1980 și 1981, Saturn și-a arătat inelele ca pe mii de brazde fine, cu structuri pe care nimeni nu le anticipase."},
+{id:"titan",label:"Titan",q:["Voyager Titan atmosphere"],must:/titan/i,fb:{t:"planet",c:[215,150,60],R:190},dur:12,
+ text:"Voyager 1 a studiat Titan, singura lună din sistemul solar cu o atmosferă groasă. Trecerea pe lângă Titan a azvârlit-o deasupra planului planetelor, încheindu-i turul planetar."},
+{id:"uranus",label:"Uranus · 1986",q:["Voyager 2 Uranus","Voyager 2 Miranda"],must:/uranus|miranda/i,fb:{t:"planet",c:[140,215,225],R:200},dur:13,
+ text:"Doar Voyager 2 și-a continuat drumul. Pe 24 ianuarie 1986 a ajuns la Uranus, o planetă răsturnată pe o parte, a descoperit zece luni noi și a fotografiat de aproape misterioasa Miranda."},
+{id:"neptun",label:"Neptun · 1989",q:["Voyager 2 Neptune Great Dark Spot","Voyager 2 Triton"],must:/neptune|triton/i,fb:{t:"planet",c:[60,100,220],R:200,bands:1},dur:13,
+ text:"Pe 25 august 1989, la Neptun, a fotografiat Marea Pată Întunecată și jeturi asemănătoare unor gheizere de pe luna Triton. Voyager 2 rămâne singura sondă care a vizitat vreodată Uranus și Neptun."},
+{id:"pbd",label:"Pale Blue Dot · 1990",q:["Pale Blue Dot Voyager"],must:/pale blue dot|earth/i,fb:{t:"dot"},dur:13,
+ text:"Pe 14 februarie 1990, la cererea lui Carl Sagan, Voyager 1 a întors camera spre casă. Pământul a apărut ca un punct palid, mai mic de un pixel, prins într-o rază de lumină."},
+{id:"familie",label:"Portret de familie",q:["Solar System family portrait Voyager 1 mosaic"],must:/family|portrait|mosaic|solar system/i,fb:{t:"trail"},dur:12,
+ text:"Imaginea făcea parte dintr-un portret de familie al sistemului solar, realizat din șaizeci de cadre. Imediat după aceea, camerele lui Voyager 1 au fost oprite pentru totdeauna."},
+{id:"disc",label:"Discul de Aur",q:["Voyager Golden Record","Voyager Golden Record cover"],must:/record|golden/i,fb:{t:"record"},dur:14,
+ text:"Fiecare sondă poartă un disc de aur, conceput de un comitet condus de Carl Sagan. Conține o sută cincisprezece imagini, saluturi în cincizeci și cinci de limbi, sunetele Pământului și o oră și jumătate de muzică."},
+{id:"coperta",label:"Scrisoare cosmică",q:["Golden Record cover diagram pulsar map"],must:/record|golden|pulsar/i,fb:{t:"record"},dur:13,
+ text:"Pe copertă, o hartă a pulsarilor indică locul Soarelui, iar instrucțiunile gravate explică cum se redă discul. Este o scrisoare pentru oricine ar putea s-o găsească, peste miliarde de ani."},
+{id:"heliopauza",label:"Spațiul interstelar",q:["Voyager heliosphere heliopause interstellar","Voyager interstellar space"],must:/voyager|heliosphere|heliopause|interstellar/i,fb:{t:"bubble"},dur:13,
+ text:"Pe 25 august 2012, Voyager 1 a trecut de heliopauză și a intrat în spațiul interstelar. Voyager 2 a făcut același pas pe 5 noiembrie 2018, iar măsurătorile lor au schimbat felul în care înțelegem bula solară."},
+{id:"energie",label:"Supraviețuirea",q:["Voyager spacecraft RTG instruments","Voyager spacecraft diagram"],must:/voyager/i,fb:{t:"probe"},dur:13,
+ text:"Sondele funcționează cu generatoare cu plutoniu, care pierd energie în fiecare an. Computerele lor au mai puțin de șaptezeci de kiloocteți de memorie, iar inginerii opresc pe rând instrumentele ca să le țină în viață."},
+{id:"dsn",label:"Rețeaua Spațială Profundă",q:["Deep Space Network antenna","Deep Space Network Canberra Goldstone"],must:/deep space network|dsn|antenna/i,fb:{t:"dsn"},dur:13,
+ text:"Semnalul lor, de ordinul a douăzeci de wați, călătorește aproape o zi până la noi și este prins de antenele Rețelei Spațiale Profunde. În 2024, echipa a reparat de la peste douăzeci de miliarde de kilometri o defecțiune a memoriei lui Voyager 1."},
+{id:"zi",label:"O zi-lumină · noiembrie 2026",q:["Voyager 1 interstellar distance"],must:/voyager/i,fb:{t:"bubble"},dur:13,
+ text:"În noiembrie 2026, Voyager 1 ajunge la o zi-lumină de Pământ, adică aproximativ douăzeci și șase de miliarde de kilometri. O comandă trimisă acum primește răspuns abia peste două zile."},
+{id:"viitor",label:"Peste 40.000 de ani",q:["Voyager interstellar artist concept","Voyager spacecraft stars"],must:/voyager/i,fb:{t:"probe"},dur:13,
+ text:"Peste aproximativ patruzeci de mii de ani, cele două sonde vor trece la câțiva ani-lumină de alte stele. Vor continua să orbiteze centrul Căii Lactee, mult după ce vor tăcea."},
+{id:"final",label:"Voyager",q:["Voyager 2 spacecraft"],must:/voyager/i,fb:{t:"probe"},dur:12,
+ text:"Voyager nu este doar o misiune științifică. Este dovada că o specie curioasă poate trimite dincolo de propria stea un mesaj: am fost aici, am privit și am vrut să înțelegem."},
+{id:"credite",label:"Credite",credits:true,q:[],fb:{t:"stars"},dur:9,text:""}
+];
+
+SCN.forEach(sc=>{sc.tx={};});
+/* ============ STARE ============ */
+const $=s=>document.querySelector(s);
+const cv=$("#cv"),stage=$("#stage");
+const DIM={"2d":[1920,1080,1],half:[1920,1080,2],full:[3840,1080,2]};
+let mode="phone",total=0,slides=[],playing=false,tStart=0,seekT=0,exporting=false,loaded=false,lastScene=-1;
+SCN.forEach(sc=>{sc.slots=(sc.q.length?sc.q:[null]).map(q=>({q,cands:[],ci:0,bmp:null,src:"",credit:"",gl:null}));});
+const log=m=>{$("#status").textContent=m;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const fmt=s=>{s=Math.max(0,s|0);return (s/60|0)+":"+String(s%60).padStart(2,"0");};
+
+function buildTL(){
+ let t=0;
+ SCN.forEach(sc=>{sc.words=sc.text.split(/\s+/).filter(Boolean).length;sc.D=Math.max(sc.dur,sc.words*0.40+1.2);sc.s=t;t+=sc.D;});
+ total=t;slides=[];
+ SCN.forEach((sc,si)=>{const n=sc.slots.length;sc.slots.forEach((sl,j)=>slides.push({sc,sl,si,s:sc.s+sc.D*j/n,e:sc.s+sc.D*(j+1)/n,dir:slides.length%4}));});
+ $("#tl").textContent=fmt(seekT)+" / "+fmt(total);
+}
+
+/* ============ IMAGINI PROCEDURALE (rezervă) ============ */
+function rng(seed){let s=7;for(const c of seed)s=(s*31+c.charCodeAt(0))>>>0;return()=>((s=(s*1664525+1013904223)>>>0)/4294967296);}
+function genFallback(sc){
+ const W=1600,H=900,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d"),r=rng(sc.id);
+ const g=x.createRadialGradient(W/2,H/2,60,W/2,H/2,W*.7);g.addColorStop(0,"#0c1226");g.addColorStop(1,"#000");x.fillStyle=g;x.fillRect(0,0,W,H);
+ for(let i=0;i<600;i++){x.fillStyle="rgba(255,255,255,"+(r()*.8+.2)+")";const s=r()<.05?2:1;x.fillRect(r()*W,r()*H,s,s);}
+ const f=sc.fb||{t:"stars"},cx=W/2,cy=H/2;
+ if(f.t==="planet"){
+  const R=f.R*1.1,[a,b,d]=f.c;
+  if(f.ring){x.save();x.translate(cx,cy);x.rotate(-.35);for(let k=0;k<7;k++){x.strokeStyle="rgba("+a+","+b+","+d+","+(.65-k*.07)+")";x.lineWidth=14;x.beginPath();x.ellipse(0,0,R*1.45+k*22,R*.38+k*5,0,Math.PI,2*Math.PI);x.stroke();}x.restore();}
+  const gr=x.createRadialGradient(cx-R*.35,cy-R*.35,R*.1,cx,cy,R);gr.addColorStop(0,"rgb("+Math.min(255,a+50)+","+Math.min(255,b+50)+","+Math.min(255,d+50)+")");gr.addColorStop(1,"rgb("+(a*.25|0)+","+(b*.25|0)+","+(d*.25|0)+")");
+  x.fillStyle=gr;x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
+  if(f.bands){x.save();x.beginPath();x.arc(cx,cy,R,0,7);x.clip();for(let k=0;k<14;k++){x.fillStyle="rgba("+(r()*80|0)+","+(r()*60|0)+",20,"+(r()*.25)+")";x.fillRect(cx-R,cy-R+k*R/7+r()*10,R*2,R/12);}x.restore();}
+  if(f.ring){x.save();x.translate(cx,cy);x.rotate(-.35);for(let k=0;k<7;k++){x.strokeStyle="rgba("+a+","+b+","+d+","+(.65-k*.07)+")";x.lineWidth=14;x.beginPath();x.ellipse(0,0,R*1.45+k*22,R*.38+k*5,0,0,Math.PI);x.stroke();}x.restore();}
+ }else if(f.t==="probe"){
+  x.save();x.translate(cx,cy);x.rotate(-.25);x.strokeStyle="#cfd6e6";x.fillStyle="#9aa6bd";x.lineWidth=3;
+  x.beginPath();x.ellipse(0,-30,120,120,0,Math.PI*.1,Math.PI*.9);x.stroke();x.fillStyle="#2b3550";x.beginPath();x.ellipse(0,-30,150,150,0,0,Math.PI*2);x.globalAlpha=.25;x.fill();x.globalAlpha=1;
+  x.fillStyle="#b9c2d6";x.fillRect(-40,90,80,70);x.fillStyle="#d4af37";x.beginPath();x.arc(60,125,22,0,7);x.fill();
+  x.lineWidth=5;x.beginPath();x.moveTo(-40,125);x.lineTo(-380,205);x.moveTo(40,160);x.lineTo(320,300);x.stroke();x.restore();
+ }else if(f.t==="rocket"){
+  const gr=x.createLinearGradient(0,H*.3,0,H);gr.addColorStop(0,"rgba(255,200,90,.95)");gr.addColorStop(1,"rgba(255,80,0,0)");x.fillStyle=gr;x.beginPath();x.moveTo(cx-40,H*.4);x.lineTo(cx+40,H*.4);x.lineTo(cx,H);x.fill();
+  x.fillStyle="#e9edf7";x.fillRect(cx-28,H*.12,56,H*.3);x.beginPath();x.moveTo(cx-28,H*.12);x.lineTo(cx,H*.02);x.lineTo(cx+28,H*.12);x.fill();
+ }else if(f.t==="trail"){
+  x.strokeStyle="rgba(120,170,255,.6)";x.setLineDash([10,8]);x.lineWidth=3;x.beginPath();x.moveTo(150,H*.8);x.bezierCurveTo(400,H*.1,900,H*1.0,W-120,H*.3);x.stroke();x.setLineDash([]);
+  [[150,.8,26,"#7fa8ff"],[420,.42,50,"#d8b184"],[760,.66,42,"#e6d09a"],[1060,.5,30,"#8fdbe5"],[1340,.37,30,"#4a74f0"]].forEach(p=>{x.fillStyle=p[3];x.beginPath();x.arc(p[0],p[1]*H,p[2],0,7);x.fill();});
+  x.fillStyle="#ffcf5a";x.beginPath();x.arc(90,H*.15,40,0,7);x.fill();
+ }else if(f.t==="dot"){
+  const gr=x.createLinearGradient(W*.2,0,W*.8,H);gr.addColorStop(0,"rgba(0,0,0,0)");gr.addColorStop(.5,"rgba(200,150,90,.35)");gr.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=gr;x.fillRect(0,0,W,H);
+  x.fillStyle="#cfe3ff";x.beginPath();x.arc(W*.62,H*.55,5,0,7);x.fill();x.fillStyle="rgba(150,190,255,.25)";x.beginPath();x.arc(W*.62,H*.55,14,0,7);x.fill();
+ }else if(f.t==="record"){
+  const R=300,gr=x.createRadialGradient(cx-80,cy-80,20,cx,cy,R);gr.addColorStop(0,"#fff0a0");gr.addColorStop(.6,"#d4af37");gr.addColorStop(1,"#6e5410");x.fillStyle=gr;x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
+  x.strokeStyle="rgba(60,40,0,.4)";x.lineWidth=1.5;for(let k=60;k<R;k+=7){x.beginPath();x.arc(cx,cy,k,0,7);x.stroke();}
+  x.fillStyle="#2a1e00";x.beginPath();x.arc(cx,cy,48,0,7);x.fill();
+ }else if(f.t==="bubble"){
+  const gr=x.createRadialGradient(cx-100,cy,40,cx,cy,380);gr.addColorStop(0,"rgba(255,200,90,.65)");gr.addColorStop(.6,"rgba(80,130,255,.25)");gr.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=gr;x.beginPath();x.ellipse(cx-100,cy,420,300,0,0,7);x.fill();
+  x.strokeStyle="#9ab8ff";x.lineWidth=2;x.beginPath();x.ellipse(cx-100,cy,420,300,0,0,7);x.stroke();
+  x.strokeStyle="#fff";x.setLineDash([8,6]);x.beginPath();x.moveTo(cx-100,cy);x.lineTo(W-60,cy-170);x.moveTo(cx-100,cy);x.lineTo(W-100,cy+130);x.stroke();x.setLineDash([]);
+ }else if(f.t==="dsn"){
+  x.fillStyle="#0a0d16";x.fillRect(0,H*.78,W,H*.22);x.save();x.translate(cx,H*.8);x.rotate(-.7);x.strokeStyle="#dfe6f5";x.lineWidth=6;x.beginPath();x.ellipse(0,-90,170,170,0,Math.PI*.15,Math.PI*.85);x.stroke();x.restore();
+  x.strokeStyle="#9aa6bd";x.lineWidth=8;x.beginPath();x.moveTo(cx-40,H*.8);x.lineTo(cx,H*.62);x.lineTo(cx+40,H*.8);x.stroke();
+ }
+ return c;
+}
+
+/* ============ ADÂNCIME ============ */
+function blur(L,w,h,r){const o=new Float32Array(w*h),t=new Float32Array(w*h);
+ for(let y=0;y<h;y++){for(let x=0;x<w;x++){let s=0,n=0;for(let k=-r;k<=r;k++){const xx=x+k;if(xx>=0&&xx<w){s+=L[y*w+xx];n++;}}t[y*w+x]=s/n;}}
+ for(let y=0;y<h;y++){for(let x=0;x<w;x++){let s=0,n=0;for(let k=-r;k<=r;k++){const yy=y+k;if(yy>=0&&yy<h){s+=t[yy*w+x];n++;}}o[y*w+x]=s/n;}}
+ return o;}
+function makeDepth(bm){
+ const dw=256,dh=Math.max(64,Math.round(256*bm.height/bm.width)),c=document.createElement("canvas");c.width=dw;c.height=dh;
+ const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(bm,0,0,dw,dh);const id=x.getImageData(0,0,dw,dh),d=id.data;
+ let L=new Float32Array(dw*dh);for(let i=0;i<dw*dh;i++)L[i]=(.3*d[i*4]+.59*d[i*4+1]+.11*d[i*4+2])/255;
+ L=blur(blur(L,dw,dh,5),dw,dh,5);
+ for(let y=0;y<dh;y++)for(let xx=0;xx<dw;xx++){const nx=(xx/dw-.5)*2,ny=(y/dh-.5)*2;L[y*dw+xx]=.6*L[y*dw+xx]+.4*Math.exp(-(nx*nx+ny*ny)*1.2);}
+ const s=Float32Array.from(L).sort(),lo=s[(s.length*.02)|0],hi=s[(s.length*.98)|0],rg=Math.max(1e-3,hi-lo);
+ for(let i=0;i<dw*dh;i++){const v=Math.max(0,Math.min(1,(L[i]-lo)/rg))*255;d[i*4]=d[i*4+1]=d[i*4+2]=v;d[i*4+3]=255;}
+ x.putImageData(id,0,0);return c;
+}
+
+/* ============ WEBGL ============ */
+const gl=cv.getContext("webgl",{preserveDrawingBuffer:true,alpha:false,antialias:false});
+if(!gl){document.body.insertAdjacentHTML("afterbegin","<p style='color:#f88;padding:12px'>"+t("noGL")+"</p>");}
+const VS="attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}";
+const PREC="#ifdef GL_FRAGMENT_PRECISION_HIGH\nprecision highp float;\n#else\nprecision mediump float;\n#endif\n";
+const FS_IMG=PREC+"varying vec2 v;uniform sampler2D uT,uD;uniform float uEye,uK,uZ,uA,uImg,uOut,uF;uniform vec2 uPan;"+
+"void main(){vec2 s=vec2(1.);if(uImg>uOut)s.x=uOut/uImg;else s.y=uImg/uOut;vec2 uv=(v-.5)*s/uZ+.5+uPan;"+
+"float d=texture2D(uD,uv).r;uv.x+=uEye*uK*(d-.5);gl_FragColor=vec4(texture2D(uT,uv).rgb*uF,uA);}";
+const FS_OV=PREC+"varying vec2 v;uniform sampler2D uT;uniform float uEye,uS,uA;"+
+"void main(){vec2 uv=v;uv.x+=uEye*uS;gl_FragColor=texture2D(uT,uv)*uA;}";
+function mkProg(fs){const p=gl.createProgram();for(const [t,src] of [[gl.VERTEX_SHADER,VS],[gl.FRAGMENT_SHADER,fs]]){const s=gl.createShader(t);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));gl.attachShader(p,s);}
+ gl.bindAttribLocation(p,0,"p");gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));
+ const u={};for(const n of ["uT","uD","uEye","uK","uZ","uA","uImg","uOut","uF","uPan","uS"])u[n]=gl.getUniformLocation(p,n);return{p,u};}
+const PI=mkProg(FS_IMG),PO=mkProg(FS_OV);
+const qb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,qb);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+function mkTex(src,pm){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,!!pm);
+ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,src);for(const [k,v] of [[gl.TEXTURE_MIN_FILTER,gl.LINEAR],[gl.TEXTURE_MAG_FILTER,gl.LINEAR],[gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE],[gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE]])gl.texParameteri(gl.TEXTURE_2D,k,v);return t;}
+function ensureGL(sl){if(sl.gl)return sl.gl;if(!sl.bmp)return null;sl.gl={t:mkTex(sl.bmp),d:mkTex(sl.dep||makeDepth(sl.bmp)),a:sl.bmp.width/sl.bmp.height};return sl.gl;}
+function freeGL(sl){if(sl.gl){gl.deleteTexture(sl.gl.t);gl.deleteTexture(sl.gl.d);sl.gl=null;}}
+
+/* ============ OVERLAY (TEXT) ============ */
+const oc=document.createElement("canvas");oc.width=1920;oc.height=1080;const ox=oc.getContext("2d");
+let ovTex=null,okey="",ovVer=0;
+function wrap(txt,maxW){const w=txt.split(" "),L=[];let l="";for(const k of w){const t=l?l+" "+k:k;if(ox.measureText(t).width>maxW&&l){L.push(l);l=k;}else l=t;}if(l)L.push(l);return L;}
+function chunks(text){
+ const out=[];(text.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).forEach(s=>{s=s.trim();const sp=(x)=>{if(x.length<=100){out.push(x);return;}let m=Math.floor(x.length/2),b=-1;for(let d=0;d<x.length/2;d++){if(x[m+d]===","||x[m+d]===" "){b=m+d;break;}if(x[m-d]===","||x[m-d]===" "){b=m-d;break;}}if(b<0){out.push(x);return;}sp(x.slice(0,b+1).trim());sp(x.slice(b+1).trim());};sp(s);});
+ return out.filter(x=>x&&x.trim());}
+function chunkAt(sc,t){const ch=sc.ch||(sc.ch=chunks(sc.text));if(!ch.length)return -1;const a=sc.s+.5,b=sc.s+sc.D-.6;if(t<a||t>b)return -1;const tot=ch.reduce((s,c)=>s+c.length,0);let acc=0;const f=(t-a)/(b-a)*tot;for(let i=0;i<ch.length;i++){acc+=ch[i].length;if(f<=acc)return i;}return ch.length-1;}
+function sceneAt(t){for(let i=SCN.length-1;i>=0;i--)if(t>=SCN[i].s)return i;return 0;}
+function creditsLines(){const L=[];SCN.forEach(sc=>sc.slots.forEach(sl=>{if(sl.src&&sl.src!=="generat"&&sl.credit)L.push(sl.credit);}));return [...new Set(L)];}
+function paint(sc,ci){
+ ox.clearRect(0,0,1920,1080);ox.textAlign="center";ox.textBaseline="alphabetic";
+ if(sc.big){ox.fillStyle="#fff";ox.font="bold 150px system-ui,sans-serif";ox.shadowColor="rgba(0,0,0,.8)";ox.shadowBlur=24;ox.fillText("VOYAGER",960,470);ox.font="300 46px system-ui,sans-serif";ox.fillStyle="#cfe3ff";ox.fillText(sc.sub,960,545);ox.shadowBlur=0;}
+ if(sc.credits){ox.fillStyle="rgba(0,0,0,.55)";ox.fillRect(380,250,1160,520);ox.shadowColor="#000";ox.shadowBlur=8;ox.fillStyle="#fff";ox.font="bold 56px system-ui,sans-serif";ox.fillText(t("cTitle"),960,340);ox.font="34px system-ui,sans-serif";ox.fillStyle="#cfe3ff";
+  const L=[t("cL1"),t("cL2"),t("cL3"),t("cL4")];L.forEach((l,i)=>ox.fillText(l,960,420+i*62));
+  ox.font="26px system-ui,sans-serif";ox.fillStyle="#9fb3d9";ox.fillText(t("cFoot"),960,700);ox.shadowBlur=0;}
+ if(ci>=0){
+  const cs=mode==="phone"?1.45:1,txt=sc.ch[ci];ox.font="bold "+Math.round(44*cs)+"px system-ui,sans-serif";const mw=Math.min(1560,1040*cs),L=wrap(txt,mw),lh=Math.round(58*cs),h=L.length*lh+28,y0=940-h;
+  ox.fillStyle="rgba(0,0,0,.52)";ox.beginPath();ox.roundRect?ox.roundRect(960-mw/2-40,y0,mw+80,h,18):ox.rect(960-mw/2-40,y0,mw+80,h);ox.fill();
+  ox.fillStyle="#fff";ox.shadowColor="rgba(0,0,0,.9)";ox.shadowBlur=6;L.forEach((l,i)=>ox.fillText(l,960,y0+14+lh*(i+.8)));ox.shadowBlur=0;
+  if(sc.label&&!sc.big){ox.font="600 "+Math.round(26*cs)+"px system-ui,sans-serif";const lw=ox.measureText(sc.label.toUpperCase()).width+36;ox.fillStyle="rgba(0,0,0,.6)";ox.fillRect(960-lw/2,y0-12-Math.round(38*cs),lw,Math.round(38*cs));ox.fillStyle="#8fd3ff";ox.fillText(sc.label.toUpperCase(),960,y0-12-Math.round(9*cs));}
+ }
+}
+function updateOverlay(t){
+ const si=sceneAt(t),sc=SCN[si],ci=chunkAt(sc,t),key=sc.id+"|"+ci+"|"+ovVer+"|"+mode;
+ if(key===okey)return;okey=key;paint(sc,ci);
+ if(!ovTex)ovTex=mkTex(oc,true);else{gl.bindTexture(gl.TEXTURE_2D,ovTex);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,oc);}
+}
+
+/* ============ RANDARE ============ */
+const XF=1.2;
+function drawSlide(S,p,eye,alpha,fade){
+ const g=ensureGL(S.sl);if(!g)return;
+ let z=1.12+.08*p,px=0,py=0;
+ if(S.dir===1)z=1.2-.08*p;else if(S.dir===2)px=(p-.5)*.06;else if(S.dir===3)py=(p-.5)*.05;
+ gl.useProgram(PI.p);const u=PI.u;
+ gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,g.t);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,g.d);
+ gl.uniform1i(u.uT,0);gl.uniform1i(u.uD,1);gl.uniform1f(u.uEye,eye);gl.uniform1f(u.uK,+$("#depth").value/100*.045);
+ gl.uniform1f(u.uZ,z);gl.uniform1f(u.uA,alpha);gl.uniform1f(u.uImg,g.a);gl.uniform1f(u.uOut,16/9);gl.uniform1f(u.uF,fade);gl.uniform2f(u.uPan,px,py);
+ gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+}
+function layout(){if(mode==="phone"){const A=Math.max(screen.width,screen.height)/Math.max(1,Math.min(screen.width,screen.height));return[Math.round(1080*Math.max(1.3,Math.min(2.4,A))),1080,2];}return DIM[mode];}
+function render(t){
+ const [W,H,n]=layout();if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+ updateOverlay(t);
+ gl.disable(gl.SCISSOR_TEST);gl.clearColor(0,0,0,1);gl.viewport(0,0,W,H);gl.clear(gl.COLOR_BUFFER_BIT);
+ let k=slides.findIndex(S=>t>=S.s&&t<S.e);if(k<0)k=slides.length-1;
+ const S=slides[k],fade=Math.max(0,Math.min(1,t/1.0,(total-t)/1.5)),swap=$("#swap").checked;
+ for(let e=0;e<n;e++){
+  let eye=n===1?0:(e===0?-1:1);if(swap)eye=-eye;
+  const vw=W/n,rx=e*vw;
+  if(mode==="phone"){let dw,dh;if($("#fit").value==="full"){dh=H;dw=H*16/9;}else{dw=vw;dh=vw*9/16;}
+   gl.enable(gl.SCISSOR_TEST);gl.scissor(rx,0,vw,H);gl.viewport(rx+(vw-dw)/2,(H-dh)/2,dw,dh);}
+  else gl.viewport(rx,0,vw,H);
+  if(k>0&&t-S.s<XF){drawSlide(slides[k-1],1,eye,1,fade);drawSlide(S,0,eye,(t-S.s)/XF,fade);}
+  else drawSlide(S,(t-S.s)/(S.e-S.s),eye,1,fade);
+  if(mode==="phone"&&$("#fit").value==="full")gl.viewport(rx,H*.1,vw,vw*9/16);
+  gl.useProgram(PO.p);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,ovTex);gl.uniform1i(PO.u.uT,0);
+  gl.uniform1f(PO.u.uEye,eye);gl.uniform1f(PO.u.uS,.004);gl.uniform1f(PO.u.uA,fade);
+  gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+ }
+ gl.disable(gl.SCISSOR_TEST);
+ for(let j=0;j<slides.length;j++)if(Math.abs(j-k)>3)freeGL(slides[j].sl);
+ if(k+1<slides.length)ensureGL(slides[k+1].sl);
+}
+
+/* ============ GENERATOR FRACTAL (GPU) ============ */
+const FXC=document.createElement("canvas"),FXSRC=document.getElementById("fxsrc").textContent;
+let fxg=null,fxBad=false,fxWarned=false;const fxProg={};
+function fxCtx(){
+ if(fxg||fxBad)return fxg;
+ try{fxg=FXC.getContext("webgl",{preserveDrawingBuffer:true,antialias:false,alpha:false});
+  if(!fxg){fxBad=true;return null;}
+  const hp=fxg.getShaderPrecisionFormat(fxg.FRAGMENT_SHADER,fxg.HIGH_FLOAT);if(!hp||!hp.precision){fxBad=true;fxg=null;return null;}
+  FXC.addEventListener("webglcontextlost",e=>{e.preventDefault();fxBad=true;fxg=null;for(const k in fxProg)delete fxProg[k];},false);
+  const b=fxg.createBuffer();fxg.bindBuffer(fxg.ARRAY_BUFFER,b);fxg.bufferData(fxg.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),fxg.STATIC_DRAW);
+  fxg.enableVertexAttribArray(0);fxg.vertexAttribPointer(0,2,fxg.FLOAT,false,0,0);
+ }catch(e){fxBad=true;}
+ return fxg;}
+function fxProgram(m){
+ if(fxProg[m]===false)throw new Error("modul M"+m+" indisponibil");
+ if(fxProg[m])return fxProg[m];
+ try{return fxProgram0(m);}catch(e){fxProg[m]=false;throw e;}}
+function fxProgram0(m){
+ const g=fxCtx();if(!g)throw new Error("WebGL indisponibil");
+ const mk=(t,src)=>{const sh=g.createShader(t);g.shaderSource(sh,src);g.compileShader(sh);if(!g.getShaderParameter(sh,g.COMPILE_STATUS))throw new Error("shader M"+m+": "+g.getShaderInfoLog(sh));return sh;};
+ const p=g.createProgram();g.attachShader(p,mk(g.VERTEX_SHADER,VS));g.attachShader(p,mk(g.FRAGMENT_SHADER,"#define M"+m+" 1\n"+FXSRC));
+ g.bindAttribLocation(p,0,"p");g.linkProgram(p);if(!g.getProgramParameter(p,g.LINK_STATUS))throw new Error("link M"+m+": "+g.getProgramInfoLog(p));
+ const u={};for(const n of ["uRes","uPass","uSeed","uTrail","uN","uRing","uView","uOff"])u[n]=g.getUniformLocation(p,n);u.uS=g.getUniformLocation(p,"uS[0]");
+ return fxProg[m]={p,u};}
+function fxRender(cfg,w,h,pass){
+ const g=fxCtx(),P=fxProgram(cfg.m),u=P.u;FXC.width=w;FXC.height=h;g.viewport(0,0,w,h);g.useProgram(P.p);g.disable(g.BLEND);
+ g.uniform2f(u.uRes,w,h);g.uniform1f(u.uPass,pass);g.uniform1f(u.uSeed,cfg.seed);g.uniform1f(u.uTrail,cfg.trail||0);
+ const sp=cfg.sp||[],arr=new Float32Array(24);sp.forEach((q,i)=>arr.set(q,i*4));g.uniform4fv(u.uS,arr);g.uniform1f(u.uN,sp.length);
+ const rg=cfg.ring||[1.22,2.28,-.22,.46],v=cfg.view||[0,0,1,0],o=cfg.off||[0,0];
+ g.uniform4f(u.uRing,rg[0],rg[1],rg[2],rg[3]);g.uniform4f(u.uView,v[0],v[1],v[2],v[3]);g.uniform2f(u.uOff,o[0],o[1]);
+ g.enable(g.SCISSOR_TEST);const tile=Math.max(32,Math.min(h,Math.floor(400000/w)));const px=new Uint8Array(4);
+ for(let y=0;y<h;y+=tile){g.scissor(0,y,w,Math.min(tile,h-y));g.drawArrays(g.TRIANGLE_STRIP,0,4);g.readPixels(0,y,1,1,g.RGBA,g.UNSIGNED_BYTE,px);}
+ g.disable(g.SCISSOR_TEST);return FXC;}
+function fxCopy(){const c=document.createElement("canvas");c.width=FXC.width;c.height=FXC.height;c.getContext("2d").drawImage(FXC,0,0);return c;}
+const SMALL=(navigator.deviceMemory&&navigator.deviceMemory<=4)||/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+/* tipuri sfere: 0 Jupiter,1 Saturn,2 Titan,3 Uranus,4 Neptun,5 Io,6 Europa,7 gheață craterizată,8 Soare,9 Terra */
+const RING=[1.22,2.28,-.22,.46];
+const FXT={
+ titlu:[{m:1,seed:3,view:[.42,-.55,1.25,0],off:[.55,-.08]}],
+ lansare:[{m:2,seed:5,view:[.05,.35,1.2,0],off:[0,.1]},{m:2,seed:7,view:[-.08,-.5,1.35,.5],off:[.2,0]}],
+ tur:[{m:0,seed:2,trail:1,ring:RING,sp:[[-1.5,-.35,.15,8],[-.6,.15,.3,0],[.3,-.2,.26,1],[1.0,.28,.16,3],[1.5,-.35,.16,4]]},
+      {m:0,seed:9,trail:1,ring:RING,view:[0,0,1,.5],sp:[[-1.55,.3,.14,8],[-.75,-.1,.22,0],[.05,.25,.2,1],[.8,-.15,.14,3],[1.45,.2,.14,4]]}],
+ jupiter:[{m:0,seed:1,sp:[[.2,0,1,0],[-1.3,.55,.1,5]]},{m:0,seed:4,view:[0,0,1,.4],sp:[[1.1,-1.25,2,0],[-.9,.55,.12,6],[.1,.7,.075,5]]}],
+ io:[{m:0,seed:3,sp:[[2.6,-1.7,3,0],[-.3,-.05,.95,5]]},{m:0,seed:6,view:[0,0,1,.3],sp:[[0,0,.95,6],[1.75,.85,.16,5]]}],
+ saturn:[{m:0,seed:2,ring:RING,sp:[[0,0,.55,1]]},{m:0,seed:5,ring:RING,view:[0,0,1,.3],sp:[[-1.9,-1,1.6,1],[1.4,.5,.1,2]]}],
+ titan:[{m:0,seed:2,sp:[[0,0,.95,2]]}],
+ uranus:[{m:0,seed:2,sp:[[0,0,.92,3]]},{m:0,seed:5,sp:[[2.4,-1.6,2.6,3],[.1,0,.93,7]]}],
+ neptun:[{m:0,seed:2,sp:[[0,0,.93,4]]},{m:0,seed:5,view:[0,0,1,.3],sp:[[1.9,-1.1,1.5,4],[-.35,0,.8,7]]}],
+ pbd:[{m:7,seed:4}],
+ familie:[{m:0,seed:11,sp:[[-1.62,0,.05,8],[-.95,.12,.07,9],[-.3,-.1,.22,0],[.45,.1,.2,1],[1.0,-.1,.12,3],[1.5,.1,.12,4]],ring:RING}],
+ disc:[{m:4,seed:6,view:[.55,.4,1,0]},{m:4,seed:8,view:[1,-.5,.8,.8]}],
+ coperta:[{m:5,seed:9,view:[.25,-.2,1,0]}],
+ heliopauza:[{m:6,seed:11},{m:6,seed:12,view:[0,0,1.25,.4]}],
+ energie:[{m:1,seed:13,view:[-.2,.8,.85,.4]},{m:1,seed:14,view:[.6,-.9,.9,-.3]}],
+ dsn:[{m:3,seed:15,view:[0,.5,1,0]},{m:3,seed:16,view:[0,-.4,1.1,.6]}],
+ zi:[{m:6,seed:17,view:[0,0,1.6,.8]}],
+ viitor:[{m:1,seed:19,view:[.3,-1.2,2.4,.9],off:[-.5,.2]},{m:1,seed:20,view:[-.1,2.2,2,.2],off:[.4,-.1]}],
+ final:[{m:1,seed:21,view:[.15,.2,1.15,.7],off:[0,-.05]}],
+ credite:[{m:8,seed:22}]};
+function fxCfg(sc,j){const a=FXT[sc.id]||[{m:8,seed:1}];if(a[j])return a[j];return Object.assign({},a[0],{seed:a[0].seed+3.7*j});}
+function genFractal(sc,j){
+ try{
+  const cfg=fxCfg(sc,j),q=$("#fxq").value==="ultra"?[3072,1728]:SMALL?[1600,900]:[2048,1152];
+  fxRender(cfg,q[0],q[1],0);const img=fxCopy();
+  fxRender(cfg,640,360,1);const dep=fxCopy();
+  FXC.width=FXC.height=1;return{img,dep};
+ }catch(e){fxBad=!fxg;if(!fxWarned){fxWarned=true;log(t("fxFail",(e.message||e).toString().slice(0,160)));}return null;}}
+function setGen(sc,sl){
+ const j=sc.slots.indexOf(sl);freeGL(sl);sl.orig=null;
+ const g=($("#fxOn")&&$("#fxOn").checked&&!fxBad)?genFractal(sc,Math.max(0,j)):null;
+ if(g){sl.bmp=g.img;sl.dep=g.dep;}else{sl.bmp=genFallback(sc);sl.dep=null;}
+ sl.src="generat";sl.credit="";}
+function spaceBg(bm,seed){
+ try{
+  if(!fxCtx())return bm;
+  const W=bm.width,H=bm.height,gx=480,gy=Math.max(8,Math.round(480*H/W));
+  const sm=document.createElement("canvas");sm.width=gx;sm.height=gy;const sx=sm.getContext("2d",{willReadFrequently:true});sx.drawImage(bm,0,0,gx,gy);
+  const d=sx.getImageData(0,0,gx,gy).data,dark=new Uint8Array(gx*gy);
+  for(let i=0;i<gx*gy;i++){const l=(d[i*4]*.3+d[i*4+1]*.59+d[i*4+2]*.11)/255;dark[i]=l<.06?1:0;}
+  const seen=new Uint8Array(gx*gy),st=[];
+  const push=(x,y)=>{const k=y*gx+x;if(dark[k]&&!seen[k]){seen[k]=1;st.push(k);}};
+  for(let x=0;x<gx;x++){push(x,0);push(x,gy-1);}for(let y=0;y<gy;y++){push(0,y);push(gx-1,y);}
+  let cnt=0;while(st.length){const k=st.pop();cnt++;const x=k%gx,y=(k/gx)|0;if(x>0)push(x-1,y);if(x<gx-1)push(x+1,y);if(y>0)push(x,y-1);if(y<gy-1)push(x,y+1);}
+  if(cnt<gx*gy*.06)return bm;
+  const mk=document.createElement("canvas");mk.width=gx;mk.height=gy;const mx=mk.getContext("2d"),mi=mx.createImageData(gx,gy);
+  for(let i=0;i<gx*gy;i++){const v=seen[i]?255:0;mi.data[i*4]=mi.data[i*4+1]=mi.data[i*4+2]=v;mi.data[i*4+3]=255;}mx.putImageData(mi,0,0);
+  const big=document.createElement("canvas");big.width=W;big.height=H;const bx=big.getContext("2d",{willReadFrequently:true});bx.imageSmoothingEnabled=true;bx.imageSmoothingQuality="high";bx.drawImage(mk,0,0,W,H);const md=bx.getImageData(0,0,W,H).data;
+  const sw=Math.min(W,1920);fxRender({m:8,seed:seed},sw,Math.round(sw*H/W),0);
+  const spc=document.createElement("canvas");spc.width=W;spc.height=H;const spx=spc.getContext("2d",{willReadFrequently:true});spx.drawImage(FXC,0,0,W,H);const sd=spx.getImageData(0,0,W,H).data;
+  const out=document.createElement("canvas");out.width=W;out.height=H;const oc2=out.getContext("2d");oc2.drawImage(bm,0,0);const od=oc2.getImageData(0,0,W,H),o=od.data;
+  for(let i=0;i<W*H;i++){const m=md[i*4]/255;if(m<.01)continue;const l=(o[i*4]*.3+o[i*4+1]*.59+o[i*4+2]*.11)/255,w=m*Math.max(0,1-l/.14);if(w<=0)continue;
+   const w6=w*.6;o[i*4]=Math.min(255,o[i*4]+sd[i*4]*w6);o[i*4+1]=Math.min(255,o[i*4+1]+sd[i*4+1]*w6);o[i*4+2]=Math.min(255,o[i*4+2]+sd[i*4+2]*w6);}
+  oc2.putImageData(od,0,0);return out;
+ }catch(e){return bm;}}
+function finishReal(sc,sl,bm){
+ freeGL(sl);sl.dep=null;sl.orig=bm;
+ const seed=1+(sc.id.length*7+sc.slots.indexOf(sl)*5)%23;
+ sl.bmp=($("#fxBg")&&$("#fxBg").checked)?spaceBg(bm,seed):bm;if(sl.bmp===bm)sl.orig=null;sl.fxbg=sl.bmp!==bm;}
+
+/* ============ ÎNCĂRCARE IMAGINI ============ */
+async function fetchT(url,ms=15000){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);try{return await fetch(url,{mode:"cors",signal:c.signal});}finally{clearTimeout(t);}}
+function fit(bm){const s=Math.min(1,1920/bm.width),c=document.createElement("canvas");c.width=Math.max(1,Math.round(bm.width*s));c.height=Math.max(1,Math.round(bm.height*s));c.getContext("2d").drawImage(bm,0,0,c.width,c.height);try{bm.close&&bm.close();}catch(e){}return c;}
+async function getBitmap(urls){for(const u of urls){try{const r=await fetchT(u);if(!r.ok)continue;return fit(await createImageBitmap(await r.blob()));}catch(e){}}return null;}
+async function nasaSearch(q,must){
+ const r=await fetchT("https://images-api.nasa.gov/search?media_type=image&page_size=24&q="+encodeURIComponent(q));const j=await r.json();
+ return j.collection.items.filter(it=>it.data&&it.data[0]&&it.links&&it.links[0]&&must.test((it.data[0].title||"")+" "+(it.data[0].description||""))).map(it=>{const th=it.links[0].href;
+  return{src:"NASA",id:it.data[0].nasa_id,title:it.data[0].title,urls:[th.replace("~thumb","~large"),th.replace("~thumb","~medium"),th]};});}
+async function commonsSearch(q,must){
+ const u="https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=24&gsrsearch="+encodeURIComponent(q)+"&prop=imageinfo&iiprop=url|extmetadata|mime&iiurlwidth=1600";
+ const j=await (await fetchT(u)).json(),P=Object.values((j.query&&j.query.pages)||{});
+ return P.filter(p=>{const i=p.imageinfo&&p.imageinfo[0];if(!i||!/jpeg|png/.test(i.mime))return false;const lic=(i.extmetadata&&i.extmetadata.LicenseShortName&&i.extmetadata.LicenseShortName.value)||"";return /public domain|pd|cc0/i.test(lic)&&must.test(p.title);})
+  .map(p=>({src:"Commons",id:p.title,title:p.title.replace(/^File:/,""),urls:[p.imageinfo[0].thumburl||p.imageinfo[0].url]}));}
+async function tryC(sc,sl,from){
+ for(let i=0;i<sl.cands.length;i++){const ci=(from+i)%sl.cands.length,c=sl.cands[ci];if(c.bad)continue;const bm=await getBitmap(c.urls);
+  if(bm){finishReal(sc,sl,bm);sl.ci=ci;sl.src=c.src;sl.credit=(c.src==="NASA"?"NASA/JPL · ":"Wikimedia Commons · ")+c.title+" ("+c.id+")";return true;}c.bad=true;}
+ return false;}
+async function loadSlot(sc,sl,from){
+ if(!sl.q){await sleep(15);setGen(sc,sl);return;}
+ if(!sl.nTried){sl.nTried=1;try{sl.cands=await nasaSearch(sl.q,sc.must);}catch(e){sl.cands=[];}}
+ if(await tryC(sc,sl,from))return;
+ if(!sl.cTried){sl.cTried=1;try{sl.cands=sl.cands.concat(await commonsSearch(sl.q,sc.must));}catch(e){}if(await tryC(sc,sl,0))return;}
+ if(!sl.bmp||sl.src==="generat"||sl.src===""){setGen(sc,sl);}
+}
+let loadingP=null;
+async function loadAll(){
+ if(loadingP)return loadingP;
+ loadingP=(async()=>{
+ const jobs=[];SCN.forEach(sc=>sc.slots.forEach(sl=>{if(sl.src!=="local")jobs.push([sc,sl]);}));const N=jobs.length;let done=0;
+ const worker=async()=>{while(jobs.length){const [sc,sl]=jobs.shift();await loadSlot(sc,sl,0);done++;log(t("imgProg",done,N,sc.label));drawList();}};
+ await Promise.all([worker(),worker(),worker(),worker()]);loaded=true;
+ const gen=[],net=[];SCN.forEach(sc=>sc.slots.forEach(sl=>(sl.src==="generat"?gen:net).push(sl)));
+ log(t("imgDone",net.length,gen.length));
+ })();
+ try{await loadingP;}finally{loadingP=null;}
+}
+async function ensureLoaded(){if(!loaded){await loadAll();}}
+
+/* ============ LISTĂ SCENE ============ */
+function drawList(){
+ const L=$("#list");if(!L.dataset.init){L.dataset.init=1;L.innerHTML="";SCN.forEach((sc,i)=>{
+  const d=document.createElement("div");d.className="sc";d.id="sc"+i;
+  d.innerHTML='<canvas width="264" height="148"></canvas><div><h3></h3><textarea></textarea><div class="b"></div></div>';L.appendChild(d);
+  const ta=d.querySelector("textarea");ta.value=sc.text;ta.disabled=!!sc.credits;ta.onchange=()=>{sc.text=ta.value;sc.tx[LANG]=ta.value;sc.ch=null;buildTL();ovVer++;};
+  const b=d.querySelector(".b");
+  sc.slots.forEach((sl,j)=>{if(!sl.q)return;const nb=document.createElement("button");nb.textContent=t("another")+(sc.slots.length>1?" "+(j+1):"");nb.onclick=async()=>{nb.disabled=true;await loadSlot(sc,sl,sl.ci+1);nb.disabled=false;drawList();render(seekT);};b.appendChild(nb);
+   const lb=document.createElement("label");lb.className="btn";lb.innerHTML=t("yours")+(sc.slots.length>1?" "+(j+1):"")+'<input type="file" accept="image/*" hidden>';
+   lb.querySelector("input").onchange=async e=>{const f=e.target.files[0];if(!f)return;freeGL(sl);sl.dep=null;sl.orig=null;sl.bmp=fit(await createImageBitmap(f));sl.src="local";sl.credit=t("ownCredit",f.name);drawList();render(seekT);};b.appendChild(lb);});});}
+ SCN.forEach((sc,i)=>{const d=$("#sc"+i);d.querySelector("h3").innerHTML=(i+1)+". "+sc.label+" <span>· "+sc.slots.map(s=>srcName(s.src)).join(", ")+" · "+fmt(sc.D||sc.dur)+"</span>";
+  const c=d.querySelector("canvas"),x=c.getContext("2d");x.fillStyle="#111";x.fillRect(0,0,264,148);const sl=sc.slots[0];if(sl.bmp)x.drawImage(sl.bmp,0,0,264,148);});
+}
+
+/* ============ SUNET ============ */
+let actx,master,destNode,sess=null,userMusic=null,userVoice=null;
+function ensureAudio(){if(actx)return;actx=new (window.AudioContext||window.webkitAudioContext)();master=actx.createGain();master.connect(actx.destination);destNode=actx.createMediaStreamDestination();master.connect(destNode);}
+function stopAudio(){if(sess){try{sess.disconnect();}catch(e){}sess=null;}try{speechSynthesis.cancel();}catch(e){}}
+const CH=[[45,52,57,60,64],[41,48,53,57,60],[48,55,60,64,67],[43,50,55,59,62]],PENT=[69,72,74,76,79,81],mf=m=>440*Math.pow(2,(m-69)/12);
+function genMusic(off,now){
+ const bus=actx.createGain(),echo=actx.createDelay(1),fb=actx.createGain(),lp=actx.createBiquadFilter(),mg=actx.createGain();
+ echo.delayTime.value=.47;fb.gain.value=.38;lp.type="lowpass";lp.frequency.value=1500;mg.gain.value=+$("#mvol").value/100*.5;
+ bus.connect(mg);bus.connect(echo);echo.connect(lp);lp.connect(fb);fb.connect(echo);lp.connect(mg);mg.connect(sess);
+ const SEG=14;
+ for(let k=Math.floor(off/SEG);k*SEG<total;k++){
+  const T0=k*SEG,st=now+Math.max(0,T0-off),en=now+(T0+SEG+2.5-off),att=T0<off?.4:3,ch=CH[k%4];if(en-st<3.2)continue;
+  ch.forEach((m,i)=>{[-6,6].forEach(dt=>{const o=actx.createOscillator(),g=actx.createGain(),f=actx.createBiquadFilter();o.type=i<2?"sine":"triangle";o.frequency.value=mf(m);o.detune.value=dt;f.type="lowpass";f.frequency.value=900;
+   g.gain.setValueAtTime(0,st);g.gain.linearRampToValueAtTime(.05,st+att);g.gain.setValueAtTime(.05,en-3);g.gain.linearRampToValueAtTime(0,en);o.connect(f);f.connect(g);g.connect(bus);o.start(st);o.stop(en+.1);});});
+  const r=rng("m"+k);for(let i=0;i<4;i++){const tt=T0+1+i*3.4+r()*1.2;if(tt<off)continue;const o=actx.createOscillator(),g=actx.createGain(),s=now+tt-off;o.type="sine";o.frequency.value=mf(PENT[(r()*PENT.length)|0]);
+   g.gain.setValueAtTime(0,s);g.gain.linearRampToValueAtTime(.07,s+.02);g.gain.exponentialRampToValueAtTime(.0002,s+3.2);o.connect(g);g.connect(bus);o.start(s);o.stop(s+3.3);}
+ }
+}
+function playBuf(buf,off,now,vol){if(!buf||off>=buf.duration)return;const s=actx.createBufferSource(),g=actx.createGain();s.buffer=buf;g.gain.value=vol;s.connect(g);g.connect(sess);s.start(now,off);}
+function startAudio(off){
+ ensureAudio();actx.resume();stopAudio();sess=actx.createGain();sess.connect(master);const now=actx.currentTime+.05;
+ if($("#musicOn").checked)genMusic(off,now);playBuf(userMusic,off,now,.8);playBuf(userVoice,off,now,1);
+ sess.gain.setValueAtTime(1,now+Math.max(0,total-off-1.5));sess.gain.linearRampToValueAtTime(0,now+Math.max(.1,total-off));
+}
+async function readAudio(f){ensureAudio();return actx.decodeAudioData(await f.arrayBuffer());}
+$("#fMusic").onchange=async e=>{if(e.target.files[0]){userMusic=await readAudio(e.target.files[0]);log(t("musLoaded",e.target.files[0].name));}};
+$("#fVoice").onchange=async e=>{if(e.target.files[0]){userVoice=await readAudio(e.target.files[0]);log(t("voiceLoaded",e.target.files[0].name));}};
+let ttsWarned=false;
+function speak(i){if(!$("#tts").checked||exporting||!SCN[i].text)return;try{const vs=speechSynthesis.getVoices(),v=vs.find(v=>new RegExp("^"+LANG,"i").test(v.lang));if(vs.length&&!v){if(!ttsWarned){ttsWarned=true;log(t("noVoice"));}return;}speechSynthesis.cancel();const sc=SCN[i],u=new SpeechSynthesisUtterance(sc.text);u.lang=TTSL[LANG];if(v)u.voice=v;u.rate=Math.max(.9,Math.min(1.5,(sc.words/2.4)/Math.max(1,sc.D-1.2)));speechSynthesis.speak(u);}catch(e){}}
+
+/* ============ REDARE ============ */
+let doneCb=null,wake=null;
+function setT(t){seekT=t;$("#seek").value=Math.round(t/total*1000);$("#tl").textContent=fmt(t)+" / "+fmt(total);}
+function loop(){
+ if(!playing)return;const t=(performance.now()-tStart)/1000;
+ if(t>=total){finish();return;}
+ const si=sceneAt(t);if(si!==lastScene){lastScene=si;speak(si);}
+ setT(t);render(t);requestAnimationFrame(loop);
+}
+function finish(){playing=false;stopAudio();setT(total);render(total-.01);if(wake){try{wake.release();}catch(e){}wake=null;}if(doneCb){const f=doneCb;doneCb=null;f();}}
+async function playFrom(t0){
+ await ensureLoaded();buildTL();if(abortExp)return;
+ playing=true;lastScene=-1;tStart=performance.now()-t0*1000;startAudio(t0);
+ try{wake=await navigator.wakeLock.request("screen");}catch(e){}
+ requestAnimationFrame(loop);
+ return new Promise(r=>{doneCb=r;});
+}
+function pause(){if(!playing)return;playing=false;stopAudio();}
+$("#bPlay").onclick=()=>{if(playing||exporting)return;let t=seekT;if(t>=total-.1)t=0;playFrom(t);};
+$("#bPause").onclick=()=>{if(exporting){cancelExport(t("expCancel"));return;}pause();};
+$("#bRestart").onclick=()=>{if(exporting)return;const w=playing;pause();setT(0);ensureLoaded().then(()=>{render(0);if(w)playFrom(0);});};
+$("#seek").oninput=async e=>{if(exporting)return;const w=playing;pause();const t=e.target.value/1000*total;setT(t);await ensureLoaded();render(t);if(w)playFrom(t);};
+function setMode(m){mode=m;$("#mode").value=m;render(seekT);}
+$("#mode").onchange=e=>{if(exporting){e.target.value=mode;return;}setMode(e.target.value);};
+$("#swap").onchange=$("#fit").onchange=()=>{if(!playing)render(seekT);};
+$("#depth").oninput=()=>{if(!playing)render(seekT);};
+$("#bFs").onclick=async()=>{try{if(!stage.requestFullscreen)throw 0;await stage.requestFullscreen();try{await screen.orientation.lock("landscape");}catch(e){}}catch(e){stage.classList.add("fs");}setTimeout(()=>render(seekT),150);};
+$("#bX").onclick=()=>{stage.classList.remove("fs");if(document.fullscreenElement)document.exitFullscreen();setTimeout(()=>render(seekT),150);};
+document.addEventListener("fullscreenchange",()=>setTimeout(()=>render(seekT),100));
+cv.onclick=()=>{if(document.fullscreenElement||stage.classList.contains("fs")){playing?pause():$("#bPlay").click();}};
+
+/* ============ EXPORT ============ */
+let abortExp=false;
+function cancelExport(msg){if(!exporting)return;abortExp=true;if(playing){playing=false;stopAudio();if(doneCb){const f=doneCb;doneCb=null;f();}}if(msg)log(msg);}
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&exporting)cancelExport(t("expHidden"));});
+$("#bCancel").onclick=()=>cancelExport(t("expCancel"));
+function dl(blob,name){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},4000);}
+async function doExport(m){
+ if(exporting)return false;exporting=true;abortExp=false;$("#bCancel").hidden=false;
+ try{return await doExport0(m);}catch(e){log(t("expErr",(e&&e.message||e)));return false;}
+ finally{exporting=false;$("#bCancel").hidden=true;}
+}
+async function doExport0(m){
+ if(m==="phone")m="half";
+ pause();setMode(m);await ensureLoaded();buildTL();ensureAudio();await Promise.race([actx.resume(),sleep(1500)]);if(abortExp)return false;
+ const stream=cv.captureStream(30),at=destNode.stream.getAudioTracks()[0];if(at)stream.addTrack(at);
+ const avc=m==="full"?"avc1.640033":"avc1.640028";
+ const types=["video/mp4;codecs="+avc+",mp4a.40.2","video/mp4","video/webm;codecs=vp9,opus","video/webm"],mt=types.find(t=>window.MediaRecorder&&MediaRecorder.isTypeSupported(t));
+ if(!mt){log(t("noRec"));return false;}
+ const rec=new MediaRecorder(stream,{mimeType:mt,videoBitsPerSecond:m==="full"?24e6:14e6,audioBitsPerSecond:192000}),ch=[];
+ rec.ondataavailable=e=>{if(e.data&&e.data.size)ch.push(e.data);};const stopped=new Promise(r=>rec.onstop=r);
+ log(t("recording",m,fmt(total)));rec.start(1000);
+ await playFrom(0);await sleep(400);rec.stop();await stopped;
+ if(abortExp)return false;
+ const ext=mt.startsWith("video/mp4")?"mp4":"webm",name={"2d":"Voyager_2D","half":"Voyager_3D_SBS_jumatate","full":"Voyager_3D_SBS_complet"}[m]+"."+ext;
+ dl(new Blob(ch,{type:mt}),name);log(t("saved",name));return true;
+}
+$("#bExp").onclick=()=>doExport(mode);
+$("#bExpAll").onclick=async()=>{for(const m of ["2d","half","full"]){if(!(await doExport(m)))return;}log(t("allSaved"));};
+$("#bLoad").onclick=async()=>{if(exporting)return;loaded=false;SCN.forEach(sc=>sc.slots.forEach(sl=>{sl.cands=[];sl.nTried=sl.cTried=0;}));await loadAll();render(seekT);};
+$("#fMany").onchange=async e=>{const fs=[...e.target.files].sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true})),sl=[];SCN.forEach(sc=>sc.slots.forEach(x=>{if(x.q)sl.push(x);}));
+ for(let i=0;i<fs.length&&i<sl.length;i++){try{const b=fit(await createImageBitmap(fs[i]));freeGL(sl[i]);sl[i].dep=null;sl[i].orig=null;sl[i].bmp=b;sl[i].src="local";sl[i].credit="Imagine proprie: "+fs[i].name;}catch(err){}}
+ drawList();render(seekT);log(t("ownPlaced",Math.min(fs.length,sl.length),sl.length));};
+$("#bFx").onclick=async()=>{if(exporting)return;let n=0;const jobs=[];SCN.forEach(sc=>sc.slots.forEach(sl=>{if(sl.src==="generat"||sl.src==="")jobs.push([sc,sl]);}));
+ for(const [sc,sl] of jobs){log(t("fxProg",++n,jobs.length,sc.label));await sleep(20);setGen(sc,sl);}
+ drawList();render(seekT);log(t("fxDone",jobs.length));};
+$("#fxBg").onchange=()=>{SCN.forEach(sc=>sc.slots.forEach(sl=>{if(sl.orig&&(sl.src==="NASA"||sl.src==="Commons"))finishReal(sc,sl,sl.orig);}));drawList();render(seekT);};
+$("#bCred").onclick=()=>{const nbg=SCN.some(sc=>sc.slots.some(sl=>sl.fxbg));const L=[t("crH"),t("crN1"),t("crN2")+(nbg?t("crN3"):""),""];
+ SCN.forEach((sc,i)=>sc.slots.forEach(sl=>L.push((i+1)+". "+sc.label+": "+(sl.credit?sl.credit+(sl.fxbg?t("crBg"):""):t("crNone")))));dl(new Blob([L.join("\n")],{type:"text/plain"}),"Voyager_credite.txt");};
+$("#bScript").onclick=()=>{const L=[t("scH"),t("scN"),""];
+ SCN.forEach(sc=>{if(sc.text)L.push("["+fmt(sc.s)+" – "+fmt(sc.s+sc.D)+"] "+sc.label+"\n"+sc.text+"\n");});dl(new Blob([L.join("\n")],{type:"text/plain"}),"Voyager_naratiune.txt");};
+
+function applyLang(){
+ document.documentElement.lang=LANG;document.title=t("title");
+ document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=t(el.dataset.i);});
+ const sel=$("#lang");if(sel)sel.value=LANG;
+}
+function setLang(l,first){
+ if(!LANGS.includes(l))return;LANG=l;try{localStorage.setItem("odiseea_lang",l);}catch(e){}
+ SCN.forEach(sc=>{const d=SCNL[l][sc.id];sc.label=d.label;if(d.sub)sc.sub=d.sub;if(!sc.credits)sc.text=sc.tx[l]!=null?sc.tx[l]:d.text;sc.ch=null;});
+ ttsWarned=false;try{speechSynthesis.cancel();}catch(e){}
+ applyLang();buildTL();ovVer++;
+ const L=$("#list");if(L)L.dataset.init="";
+ if(!first){drawList();render(seekT);}
+}
+/* ============ START ============ */
+buildTL();drawList();
+$("#lang").onchange=e=>{if(exporting){e.target.value=LANG;return;}setLang(e.target.value);};
+(async()=>{setLang(LANG,true);SCN.forEach(sc=>sc.slots.forEach(sl=>{if(!sl.bmp){sl.bmp=genFallback(sc);sl.src="";}}));try{setGen(SCN[0],SCN[0].slots[0]);}catch(e){}drawList();render(0);log(t("hint"));})();
+</script>
+</body>
+</html>
