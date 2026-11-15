@@ -26,8 +26,8 @@ fieldset{border:1px solid #223055;border-radius:10px;margin:10px 0;padding:8px 1
 legend{color:#8fa0bd;padding:0 6px;font-size:13px}
 #status{font-size:13px;color:#9fb3d9;min-height:1.4em;white-space:pre-wrap}
 .sc{display:grid;grid-template-columns:132px 1fr;gap:10px;border-top:1px solid #1b2542;padding:10px 0}
-.sc canvas{width:132px;height:74px;background:#111;border-radius:6px}
-.sc h3{margin:0 0 4px;font-size:14px}
+.sc{grid-template-columns:1fr}.ths{display:flex;gap:8px;flex-wrap:wrap}.th{margin:0;width:150px;cursor:pointer}.th canvas{width:150px;height:84px;background:#111;border-radius:6px;display:block}.th.vd canvas{outline:2px solid #fa4}.th figcaption{font-size:10px;color:#8da0c8;margin-top:2px;line-height:1.25;max-height:2.5em;overflow:hidden}
+.sc h3{margin:0;font-size:14px}
 .sc h3 span{color:#7f93bd;font-weight:400;font-size:12px}
 .sc textarea{width:100%;min-height:64px;background:#0d1426;color:#dfe6f2;border:1px solid #223055;border-radius:6px;padding:6px;font:13px/1.4 inherit}
 .sc .b{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
@@ -37,7 +37,7 @@ legend{color:#8fa0bd;padding:0 6px;font-size:13px}
 #stage.fs #cv,#stage.fs #cv2{width:100vw;height:100vh;object-fit:contain}
 #bX{position:absolute;top:8px;right:8px;z-index:100;display:none}
 #stage.fs #bX,#stage:fullscreen #bX{display:block}
-@media(max-width:560px){.sc{grid-template-columns:1fr}.sc canvas{width:100%;height:auto;aspect-ratio:16/9}}
+@media(max-width:560px){.th{width:46%}.th canvas{width:100%;height:auto;aspect-ratio:16/9}}
 </style>
 </head>
 <body>
@@ -1226,14 +1226,19 @@ async function ensureLoaded(){if(!loaded){await loadAll();}}
 function drawList(){
  const L=$("#list");if(!L.dataset.init){L.dataset.init=1;L.innerHTML="";SCN.forEach((sc,i)=>{
   const d=document.createElement("div");d.className="sc";d.id="sc"+i;
-  d.innerHTML='<canvas width="264" height="148"></canvas><div><h3></h3><textarea></textarea><div class="b"></div></div>';L.appendChild(d);
+  d.innerHTML='<h3></h3><div class="ths"></div><div><textarea></textarea><div class="b"></div></div>';L.appendChild(d);
   const ta=d.querySelector("textarea");ta.value=sc.text;ta.disabled=!!sc.credits;ta.onchange=()=>{sc.text=ta.value;sc.tx[LANG]=ta.value;sc.ch=null;buildTL();ovVer++;};
   const b=d.querySelector(".b");
   sc.slots.forEach((sl,j)=>{if(!sl.q)return;const nb=document.createElement("button");nb.textContent=t("another")+(sc.slots.length>1?" "+(j+1):"");nb.onclick=async()=>{nb.disabled=true;await loadSlot(sc,sl,sl.ci+1);nb.disabled=false;drawList();render(seekT);};b.appendChild(nb);
    const lb=document.createElement("label");lb.className="btn";lb.innerHTML=t("yours")+(sc.slots.length>1?" "+(j+1):"")+'<input type="file" accept="image/*" hidden>';
    lb.querySelector("input").onchange=async e=>{const f=e.target.files[0];if(!f)return;freeGL(sl);sl.dep=null;sl.orig=null;sl.bmp=fit(await createImageBitmap(f));sl.src="local";sl.credit=t("ownCredit",f.name);drawList();render(seekT);};b.appendChild(lb);});});}
  SCN.forEach((sc,i)=>{const d=$("#sc"+i);d.querySelector("h3").innerHTML=(i+1)+". "+sc.label+" <span>· "+sc.slots.map(s=>srcName(s.src)).join(", ")+" · "+fmt(sc.D||sc.dur)+"</span>";
-  const c=d.querySelector("canvas"),x=c.getContext("2d");x.fillStyle="#111";x.fillRect(0,0,264,148);const sl=sc.slots[0];if(sl.bmp)x.drawImage(sl.bmp,0,0,264,148);});
+  const box=d.querySelector(".ths");box.innerHTML="";
+  sc.slots.forEach((sl,j)=>{const f=document.createElement("figure");f.className="th";const c=document.createElement("canvas");c.width=240;c.height=135;const x=c.getContext("2d");x.fillStyle="#111";x.fillRect(0,0,240,135);
+   if(sl.bmp){const w=sl.bmp.width,h=sl.bmp.height,a=w/h,oa=16/9;let sw=w,sh=h;if(a>oa)sw=h*oa;else sh=w/oa;x.drawImage(sl.bmp,(w-sw)/2,(h-sh)/2,sw,sh,0,0,240,135);}
+   const cp=document.createElement("figcaption");cp.textContent=(sl.vid?"▶ ":"")+(sl.credit||srcName(sl.src)).replace(/^(NASA\/JPL|NASA \(video\)|Wikimedia Commons) · /,"");cp.title=sl.credit||"";
+   f.append(c,cp);if(sl.vid)f.classList.add("vd");
+   f.onclick=()=>{const S=slides.find(z=>z.sl===sl);if(S){setT(S.s+.05);render(S.s+.05);}};box.appendChild(f);});});
 }
 
 /* ============ SUNET ============ */
