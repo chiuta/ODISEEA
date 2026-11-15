@@ -1256,6 +1256,8 @@ async function getBitmap(urls,minW){for(const u of urls){if(abortLoad)return nul
 const MINW=1000,PIA=new Set(["jupiter","io","saturn","titan","uranus","neptun","pbd","familie"]);
 /* ---- relevanță: scor pe titlu/descriere/cuvinte-cheie + preferințe pe scenă ---- */
 const PREF={titlu:/spacecraft|probe/,lansare:/launch|titan.?centaur|cape canaveral/,tur:/grand tour|trajectory|alignment/,jupiter:/great red spot|jupiter/,io:/volcan|plume|europa|\bio\b/,saturn:/rings?|saturn/,titan:/titan|haze|atmosphere/,uranus:/uranus|miranda/,neptun:/dark spot|triton|neptune/,pbd:/pale blue dot/,familie:/family portrait|solar system portrait|mosaic/,disc:/golden record|record/,coperta:/cover|pulsar|diagram|instructions/,heliopauza:/heliopause|interstellar|heliosphere/,energie:/rtg|power|instrument|thermoelectric/,dsn:/deep space network|antenna|canberra|goldstone|madrid/,zi:/interstellar|distance|light.?day/,viitor:/interstellar|stars|concept/,final:/spacecraft|voyager/};
+const PLAN={jupiter:/jupiter|red spot/,io:/\bio\b|europa|galilean|volcan/,saturn:/saturn|ring/,titan:/titan/,uranus:/uranus|miranda|ariel|titania|oberon|umbriel/,neptun:/neptun|triton|dark spot/,pbd:/pale blue dot/,familie:/family|portrait|mosaic|solar system/};
+const PLANALL=/jupiter|saturn|uranus|neptun|titan|triton|europa|\bio\b|mars\b|venus|mercury|pluto/;
 const BADRX=/how long|infographic|scientist|engineer|speaks|panel|briefing|conference|webinar|presentation|manager|director|interview|logo|patch|stamp|poster|crew|team|astronaut|lego|toy|cake|costume|coloring|t-?shirt|meeting|ceremony|press conference|award|sticker|emoji|quiz|webinar|trailer|tutorial|interview/i;
 const tk=c=>"t:"+String(c.title||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim().slice(0,60);
 const STOP=/^(this|that|with|from|their|there|which|where|about|these|those|have|been|were|will|into|only|each|other|first|every|still|world|worlds)$/;
@@ -1266,6 +1268,9 @@ function relScore(m,sc,q){
  if(ti.includes(ql))s+=6;
  let kk=0;textKw(sc).forEach(w=>{if(ti.includes(w))kk+=2;else if(txt.includes(w))kk+=1;});s+=Math.min(6,kk);
  const pf=PREF[sc.id];if(pf){if(pf.test(txt))s+=5;if(pf.test(ti))s+=3;}
+ const pl=PLAN[sc.id];if(pl){if(pl.test(ti))s+=7;else if(pl.test(txt))s+=2;else s-=3;
+  if(sc.id!=="familie"){const o=ti.match(PLANALL);if(o&&!pl.test(ti))s-=5;}
+  if(sc.id==="pbd"){if(/pale blue dot/.test(ti))s+=8;if(/earth/.test(ti))s+=2;if(/revisited|reprocess|2020/.test(txt))s+=2;}}
  if(/voyager/.test(ti))s+=4;else if(/voyager/.test(txt))s+=1;
  if(/jpl|jet propulsion/i.test(m.center||""))s+=2;
  if(BADRX.test(ti))s-=10;
@@ -1452,7 +1457,7 @@ function drawList(){
   d.innerHTML='<h3></h3><div class="ths"></div><div><textarea></textarea><div class="b"></div></div>';L.appendChild(d);
   const ta=d.querySelector("textarea");ta.value=sc.text;ta.disabled=!!sc.credits;ta.onchange=()=>{sc.text=ta.value;sc.tx[LANG]=ta.value;sc.ch=null;buildTL();ovVer++;saveSoon();};
   const b=d.querySelector(".b");
-  sc.slots.forEach((sl,j)=>{if(!sl.q)return;const nb=document.createElement("button");nb.textContent=t("another")+(sc.slots.length>1?" "+(j+1):"");nb.onclick=async()=>{nb.disabled=true;await loadSlot(sc,sl,sl.ci+1);nb.disabled=false;drawList();render(seekT);};b.appendChild(nb);
+  sc.slots.forEach((sl,j)=>{if(!sl.q)return;const nb=document.createElement("button");nb.textContent=t("another")+(sc.slots.length>1?" "+(j+1):"");nb.onclick=async()=>{nb.disabled=true;const cur=sl.cands&&sl.cands[sl.ci];if(cur&&sc.used){sc.used.delete(cur.id);sc.used.delete(tk(cur));}await loadSlot(sc,sl,sl.ci+1);nb.disabled=false;drawList();render(seekT);};b.appendChild(nb);
    const lb=document.createElement("label");lb.className="btn";lb.innerHTML=t("yours")+(sc.slots.length>1?" "+(j+1):"")+'<input type="file" accept="image/*,video/*" hidden>';
    lb.querySelector("input").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{await addLocalMedia(sc,sl,f);}catch(err){log(t("vidBad",f.name));}buildTL();drawList();render(seekT);};b.appendChild(lb);});
   if(!sc.credits){const ab=document.createElement("label");ab.className="btn";ab.innerHTML=t("addMedia")+'<input type="file" accept="image/*,video/*" multiple hidden>';
