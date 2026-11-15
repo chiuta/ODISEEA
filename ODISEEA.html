@@ -1470,7 +1470,7 @@ function speak(i){if(!$("#tts").checked||exporting||!SCN[i].text)return;try{cons
 let doneCb=null,wake=null;
 function setT(t){seekT=t;$("#seek").value=Math.round(t/total*1000);const tl=fmt(t)+" / "+fmt(total);$("#tl").textContent=tl;$("#sSeek").value=Math.round(t/total*1000);$("#sTime").textContent=tl;}
 function loop(){
- if(!playing)return;const nw=performance.now();if(LF){const dt=Math.min(120,nw-LF);FE=FE*.9+dt*.1;if(++FC>90&&FE>42&&QP==="auto"&&QF>.5&&!exporting){QF=Math.max(.5,QF*.8);FC=0;log(t("qDown"));}}LF=nw;const t=(nw-tStart)/1000;
+ if(!playing)return;const nw=performance.now();if(LF){const dt=Math.min(120,nw-LF);FE=FE*.9+dt*.1;if(++FC>90&&FE>42&&QP==="auto"&&QF>.5&&!exporting){QF=Math.max(.5,QF*.8);FC=0;log(L10("qDown"));}}LF=nw;const t=(nw-tStart)/1000;
  if(t>=total){finish();return;}
  const si=sceneAt(t);if(si!==lastScene){lastScene=si;speak(si);}
  setT(t);render(t);prewarm(t);requestAnimationFrame(loop);
@@ -1622,7 +1622,7 @@ async function enterPres(start){
  try{if(!stage.requestFullscreen)throw 0;await stage.requestFullscreen({navigationUI:"hide"});}catch(e){stage.classList.add("fs");}
  try{await screen.orientation.lock("landscape");}catch(e){if(innerHeight>innerWidth&&!ROT)setRot(1,true);}
  showCtl();setTimeout(()=>{try{render(seekT);}catch(e){}},150);
- if(start&&!exporting){if(playing)pause();playFrom(0);}}
+ if(start&&!exporting&&!playing)playFrom(seekT>=total-.1?0:seekT);}
 function exitPres(){if(!presOn&&!stage.classList.contains("fs"))return;presOn=false;stage.classList.remove("pres","fs","showc");setRot(0);
  try{if(document.fullscreenElement)document.exitFullscreen();}catch(e){}try{screen.orientation.unlock();}catch(e){}setTimeout(()=>{try{render(seekT);}catch(e){}},150);}
 function seekTo(t){t=Math.max(0,Math.min(total-.05,t));const w=playing;pause();setT(t);render(t);if(w)playFrom(t);}
