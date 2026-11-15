@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark"><meta name="theme-color" content="#05070f">
+<title>ODISEEA — Premieră online · Voyager 1 și 2</title>
+<meta name="description" content="Premieră online: documentarul ODISEEA despre Voyager 1 și 2, în versiune 2D și 3D SBS. Gratuit, trade-free, fără urmărire.">
+<meta property="og:type" content="video.other">
+<meta property="og:title" content="ODISEEA — Premieră online · Voyager 1 și 2">
+<meta property="og:description" content="Documentar contemplativ despre Voyager 1 și 2, 2D și 3D SBS. Gratuit, trade-free.">
+<meta property="og:url" content="https://odiseea.chiuta.ro/premiera.html">
+<meta name="twitter:card" content="summary">
+<style>
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:#07090f;color:#dfe6f2;font:16px/1.55 system-ui,Segoe UI,Roboto,sans-serif}
+a{color:#8fc0ff}a:hover{color:#fff}
+:focus-visible{outline:3px solid #ffd54a;outline-offset:2px}
+.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.skip{position:absolute;left:8px;top:-60px;background:#ffd54a;color:#000;padding:8px 12px;border-radius:6px;z-index:10}.skip:focus{top:8px}
+header{max-width:960px;margin:0 auto;padding:14px 16px 6px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.logo{font-size:22px;letter-spacing:.18em;font-weight:600;color:#fff;text-decoration:none}
+.badge{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#9fb4d8;border:1px solid #2b3b66;border-radius:999px;padding:4px 12px}
+.tools{display:flex;gap:8px;align-items:center;font-size:13px;color:#8fa0bd}
+select,button,.btn{background:#16203a;color:#e8eefc;border:1px solid #2b3b66;border-radius:8px;padding:9px 13px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block;touch-action:manipulation}
+select{padding:5px 8px;font-size:13px}
+button:hover,.btn:hover,select:hover{background:#1e2c52;color:#fff}
+.btn.pri,button.pri{background:#2858c9;border-color:#3d6ee0;color:#fff}.btn.pri:hover,button.pri:hover{background:#3468e0}
+button[aria-pressed=true]{background:#2858c9;border-color:#3d6ee0}
+main{max-width:960px;margin:0 auto;padding:0 16px 48px}
+h1{font-size:clamp(26px,5vw,42px);line-height:1.15;margin:18px 0 4px;color:#fff}
+.by{margin:0 0 14px;color:#9fb4d8}
+h2{font-size:22px;margin:0 0 10px;color:#fff}
+section{margin:30px 0}
+.player{position:relative;background:#000;border:1px solid #223055;border-radius:10px;overflow:hidden;aspect-ratio:16/9}
+.player video{width:100%;height:100%;display:block;background:#000}
+.poster{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:20px;
+background:radial-gradient(circle at 72% 38%,#9ec5ff 0 .35%,transparent .6%),radial-gradient(circle at 18% 70%,#fff 0 .25%,transparent .5%),radial-gradient(circle at 40% 20%,#fff 0 .2%,transparent .4%),radial-gradient(ellipse at 50% 120%,#17306a 0,#07090f 60%)}
+.poster b{font-size:clamp(20px,4vw,34px);letter-spacing:.3em;color:#fff}
+.poster p{margin:0;max-width:34em;color:#b9c8e4}
+.tabs{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.box{background:#0d1428;border:1px solid #223055;border-radius:12px;padding:16px 18px}
+.cd{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 0}
+.cd div{min-width:78px;text-align:center;background:#101a36;border:1px solid #2b3b66;border-radius:10px;padding:8px 6px}
+.cd b{display:block;font-size:30px;font-variant-numeric:tabular-nums;color:#fff;line-height:1.1}
+.cd span{font-size:12px;color:#9fb4d8;letter-spacing:.08em;text-transform:uppercase}
+.when{font-size:18px;color:#dfe6f2;margin:0}
+ul.tick{list-style:none;padding:0;margin:12px 0}
+ul.tick li{padding:5px 0 5px 28px;position:relative}
+ul.tick li:before{content:"✓";position:absolute;left:0;color:#6fe3a0;font-weight:700}
+.price{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:14px 0}
+.price b{font-size:40px;color:#fff}.price span{color:#9fb4d8}
+ol{padding-left:22px}ol li{margin:6px 0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.dl{display:flex;flex-direction:column;gap:8px}
+.note{font-size:13px;color:#8fa0bd}
+footer{max-width:960px;margin:0 auto;padding:18px 16px 40px;border-top:1px solid #1b2547;font-size:13px;color:#8fa0bd}
+body.hc{background:#000;color:#fff}body.hc .box,body.hc .cd div{background:#000;border:2px solid #fff}body.hc a{color:#ff0}body.hc .by,body.hc .note,body.hc footer,body.hc .cd span,body.hc .badge,body.hc .tools{color:#fff}
+body.hc button,body.hc .btn,body.hc select{background:#000;color:#fff;border:2px solid #fff}
+@media (pointer:coarse){button,.btn,select{min-height:44px}}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main" data-t="skip">Salt la conținut</a>
+<header>
+ <a class="logo" href="./">ODISEEA</a>
+ <span class="badge" data-t="badge">Premieră · proiecție online</span>
+ <div class="tools">
+  <button id="hc" type="button" aria-pressed="false" data-t="hc">Contrast ridicat</button>
+  <label><span class="sr">Language / Limba</span>
+   <select id="lang" aria-label="Language / Limba">
+    <option value="ro">Română</option><option value="en">English</option><option value="fr">Français</option><option value="it">Italiano</option>
+    <option value="es">Español</option><option value="pt">Português</option><option value="de">Deutsch</option><option value="hu">Magyar</option>
+   </select></label>
+ </div>
+</header>
+
+<main id="main">
+ <h1 data-t="title">Voyager 1 și 2 — Odiseea</h1>
+ <p class="by" data-t="by">Un documentar de Alexio, realizat cu ODISEEA</p>
+
+ <!-- 1. Player -->
+ <section aria-labelledby="tTitle" id="film">
+  <h2 class="sr" id="tTitle" data-t="title">Voyager 1 și 2 — Odiseea</h2>
+  <div class="tabs" role="group" aria-label="Format">
+   <button type="button" id="b2d" aria-pressed="true" data-t="t2d">2D</button>
+   <button type="button" id="b3d" aria-pressed="false" data-t="t3d">3D SBS (ochelari VR)</button>
+  </div>
+  <div class="player">
+   <video id="vid" controls playsinline preload="metadata" hidden></video>
+   <div class="poster" id="poster">
+    <b>VOYAGER</b>
+    <p data-t="soon">Filmul apare aici la premieră. Până atunci îl poți reda direct în aplicație.</p>
+    <a class="btn pri" href="./" data-t="play">Redă în ODISEEA</a>
+   </div>
+  </div>
+ </section>
+
+ <!-- 2. Comentarii -->
+ <section aria-labelledby="cH">
+  <h2 id="cH" data-t="comH">Comentarii</h2>
+  <p data-t="comT">Fără widget-uri externe și fără urmărire. Spune-ne ce crezi pe GitHub sau prin e-mail.</p>
+  <p><a class="btn" id="gh" href="https://github.com/chiuta/odiseea/discussions" rel="noopener" data-t="comGh">Discută pe GitHub</a>
+     <a class="btn" href="mailto:alexio@trom.tf?subject=ODISEEA" data-t="comMail">Scrie-ne un e-mail</a></p>
+ </section>
+
+ <!-- 3. Premiera / numărătoare inversă -->
+ <section aria-labelledby="pH">
+  <div class="box">
+   <h2 id="pH" data-t="cdH">Premiera online</h2>
+   <p class="when" id="when"></p>
+   <div class="cd" id="cd" role="timer" aria-live="off">
+    <div><b id="cD">0</b><span data-t="d">zile</span></div>
+    <div><b id="cH2">0</b><span data-t="h">ore</span></div>
+    <div><b id="cM">0</b><span data-t="m">min</span></div>
+    <div><b id="cS">0</b><span data-t="s">sec</span></div>
+   </div>
+   <p class="note" id="cdDone" hidden data-t="cdDone"></p>
+  </div>
+ </section>
+
+ <!-- 4. Pachetul complet -->
+ <section aria-labelledby="oH" id="pachet">
+  <div class="box">
+   <h2 id="oH" data-t="offH">Pachetul complet — gratuit</h2>
+   <p class="note" data-t="offS">Trade-free: fără plată, fără cont, fără date personale.</p>
+   <ul class="tick">
+    <li data-t="b1"></li><li data-t="b2"></li><li data-t="b3"></li><li data-t="b4"></li><li data-t="b5"></li><li data-t="b6"></li>
+   </ul>
+   <div class="price"><b data-t="price">0 €</b></div>
+   <p><a class="btn pri" href="#descarcari" data-t="cta">Vreau pachetul complet</a></p>
+   <p class="note"><span data-t="supT">Proiectul rămâne gratuit. Dacă vrei, îl poți sprijini voluntar:</span>
+     <a href="https://patreon.com/c/alexio_tf" rel="noopener">Patreon</a> ·
+     <a href="https://buymeacoffee.com/echo.of.the.strings" rel="noopener">Buy Me a Coffee</a></p>
+  </div>
+ </section>
+
+ <!-- 5. Ghid de vizionare + propria versiune -->
+ <div class="cols">
+  <section aria-labelledby="gH" class="box">
+   <h2 id="gH" data-t="gH">Ghid de vizionare</h2>
+   <ol><li data-t="g1"></li><li data-t="g2"></li><li data-t="g3"></li><li data-t="g4"></li></ol>
+  </section>
+  <section aria-labelledby="mH" class="box">
+   <h2 id="mH" data-t="mH">Fă-ți propria versiune</h2>
+   <ol><li data-t="m1"></li><li data-t="m2"></li><li data-t="m3"></li></ol>
+   <p><a class="btn" href="./" data-t="play">Redă în ODISEEA</a></p>
+  </section>
+ </div>
+
+ <!-- 6. Descărcări -->
+ <section aria-labelledby="dH" id="descarcari">
+  <h2 id="dH" data-t="dlH">Descărcări</h2>
+  <div class="dl">
+   <a class="btn" id="dl2d" href="#" hidden download data-t="dl2d">Film 2D</a>
+   <a class="btn" id="dlSbs" href="#" hidden download data-t="dlSbs">Film 3D SBS</a>
+   <a class="btn" href="ODISEEA.html" download data-t="dlApp">Aplicația ODISEEA (un singur fișier HTML)</a>
+   <a class="btn" href="GALERIE.html" data-t="dlGal">Galeria surselor NASA/JPL</a>
+   <a class="btn" href="https://github.com/chiuta/odiseea" rel="noopener" data-t="dlSrc">Cod-sursă (MIT)</a>
+  </div>
+ </section>
+</main>
+
+<footer>
+ <p data-t="fP">Această pagină nu folosește cookie-uri, scripturi externe sau urmărire. Nu trimite nicio dată.</p>
+ <p data-t="fD">Proiect independent, neafiliat NASA sau JPL. Imaginile aparțin NASA/JPL-Caltech și altor surse din domeniul public; verifică creditele.</p>
+</footer>
+<noscript><p style="max-width:960px;margin:0 auto;padding:16px">ODISEEA · Voyager 1 &amp; 2 — <a href="./">open the app / deschide aplicația</a>.</p></noscript>
+
+<script>
+"use strict";
+/* ===== CONFIGURARE (completează după export) ===================================
+   VIDEO: adresele fișierelor exportate din ODISEEA (ex. archive.org, același domeniu).
+   Lasă "" cât timp nu există; pagina arată atunci butonul „Redă în ODISEEA”.        */
+const CONFIG={
+  PREMIERE:"2026-11-22T20:00:00+02:00",      // duminică 22 noiembrie 2026, ora României
+  VIDEO:{ "2d":"", "sbs":"" }                // ex. "https://archive.org/download/odiseea/odiseea-2d.mp4"
+};
+
+const L={
+ro:{skip:"Salt la conținut",badge:"Premieră · proiecție online",hc:"Contrast ridicat",title:"Voyager 1 și 2 — Odiseea",by:"Un documentar de Alexio, realizat cu ODISEEA",t2d:"2D",t3d:"3D SBS (ochelari VR)",play:"Redă în ODISEEA",soon:"Filmul apare aici la premieră. Până atunci îl poți reda direct în aplicație.",comH:"Comentarii",comT:"Fără widget-uri externe și fără urmărire. Spune-ne ce crezi pe GitHub sau prin e-mail.",comGh:"Discută pe GitHub",comMail:"Scrie-ne un e-mail",cdH:"Premiera online",d:"zile",h:"ore",m:"min",s:"sec",cdDone:"Premiera a avut loc — filmul este disponibil.",offH:"Pachetul complet — gratuit",offS:"Trade-free: fără plată, fără cont, fără date personale.",b1:"Documentarul (~4,5 min) în versiune 2D, Full HD",b2:"Versiunea 3D SBS (jumătate și completă) pentru ochelari VR BOX / 3DBOX",b3:"Textul narațiunii și creditele imaginilor (.txt), în 8 limbi",b4:"Ghid de vizionare: cum îl privești contemplativ, pe ecran sau în ochelari",b5:"Aplicația ODISEEA însăși: refă filmul cu imaginile și vocea ta",b6:"Cod-sursă (licență MIT) și galeria surselor NASA/JPL",price:"0 €",cta:"Vreau pachetul complet",supT:"Proiectul rămâne gratuit. Dacă vrei, îl poți sprijini voluntar:",gH:"Ghid de vizionare",g1:"Cameră întunecată, sunet pornit. Filmul e lent și contemplativ — nu-l grăbi.",g2:"Pe ecran sau TV: alege 2D și pune-l pe ecran complet.",g3:"În ochelari VR BOX / 3DBOX: alege 3D SBS jumătate, telefonul orizontal, ecran complet, apoi pune-l în ochelari.",g4:"Durează cam 4,5 minute. Vizionează-l de două ori: a doua oară vezi ce ai ratat.",mH:"Fă-ți propria versiune",m1:"Deschide ODISEEA și încarcă imaginile NASA/JPL sau pe ale tale.",m2:"Alege muzica și limba narațiunii; poți încărca propria voce.",m3:"Exportă 2D, SBS jumătate sau SBS complet (ține fila în prim-plan).",dlH:"Descărcări",dl2d:"Film 2D",dlSbs:"Film 3D SBS",dlApp:"Aplicația ODISEEA (un singur fișier HTML)",dlGal:"Galeria surselor NASA/JPL",dlSrc:"Cod-sursă (MIT)",fP:"Această pagină nu folosește cookie-uri, scripturi externe sau urmărire. Nu trimite nicio dată.",fD:"Proiect independent, neafiliat NASA sau JPL. Imaginile aparțin NASA/JPL-Caltech și altor surse din domeniul public; verifică creditele."},
+en:{skip:"Skip to content",badge:"Premiere · online screening",hc:"High contrast",title:"Voyager 1 & 2 — Odyssey",by:"A documentary by Alexio, made with ODISEEA",t2d:"2D",t3d:"3D SBS (VR headset)",play:"Play in ODISEEA",soon:"The film appears here at the premiere. Until then you can play it directly in the app.",comH:"Comments",comT:"No external widgets, no tracking. Tell us what you think on GitHub or by e-mail.",comGh:"Discuss on GitHub",comMail:"Send an e-mail",cdH:"Online premiere",d:"days",h:"hours",m:"min",s:"sec",cdDone:"The premiere has taken place — the film is available.",offH:"The complete package — free",offS:"Trade-free: no payment, no account, no personal data.",b1:"The documentary (~4.5 min) in 2D, Full HD",b2:"The 3D SBS version (half and full) for VR BOX / 3DBOX headsets",b3:"Narration text and image credits (.txt), in 8 languages",b4:"A viewing guide: how to watch it contemplatively, on a screen or in a headset",b5:"The ODISEEA app itself: remake the film with your own images and voice",b6:"Source code (MIT licence) and the NASA/JPL source gallery",price:"€0",cta:"I want the complete package",supT:"The project stays free. If you wish, you can support it voluntarily:",gH:"Viewing guide",g1:"Dark room, sound on. The film is slow and contemplative — don't rush it.",g2:"On a screen or TV: choose 2D and go full screen.",g3:"In VR BOX / 3DBOX headsets: choose 3D SBS half, phone in landscape, full screen, then slot it into the headset.",g4:"It runs about 4.5 minutes. Watch it twice: the second time you see what you missed.",mH:"Make your own version",m1:"Open ODISEEA and load the NASA/JPL images or your own.",m2:"Pick the music and narration language; you can upload your own voice.",m3:"Export 2D, SBS half or SBS full (keep the tab in the foreground).",dlH:"Downloads",dl2d:"2D film",dlSbs:"3D SBS film",dlApp:"The ODISEEA app (a single HTML file)",dlGal:"NASA/JPL source gallery",dlSrc:"Source code (MIT)",fP:"This page uses no cookies, external scripts or tracking. It sends no data.",fD:"Independent project, not affiliated with NASA or JPL. Images belong to NASA/JPL-Caltech and other public-domain sources; check the credits."},
+fr:{skip:"Aller au contenu",badge:"Première · projection en ligne",hc:"Contraste élevé",title:"Voyager 1 et 2 — Odyssée",by:"Un documentaire d'Alexio, réalisé avec ODISEEA",t2d:"2D",t3d:"3D SBS (casque VR)",play:"Lire dans ODISEEA",soon:"Le film apparaît ici lors de la première. D'ici là, vous pouvez le lire directement dans l'application.",comH:"Commentaires",comT:"Pas de widgets externes, pas de suivi. Dites-nous ce que vous en pensez sur GitHub ou par e-mail.",comGh:"Discuter sur GitHub",comMail:"Envoyer un e-mail",cdH:"Première en ligne",d:"jours",h:"heures",m:"min",s:"sec",cdDone:"La première a eu lieu — le film est disponible.",offH:"Le pack complet — gratuit",offS:"Trade-free : sans paiement, sans compte, sans données personnelles.",b1:"Le documentaire (~4,5 min) en 2D, Full HD",b2:"La version 3D SBS (demi et complète) pour casques VR BOX / 3DBOX",b3:"Le texte de la narration et les crédits des images (.txt), en 8 langues",b4:"Un guide de visionnage : le regarder de façon contemplative, sur écran ou en casque",b5:"L'application ODISEEA elle-même : refaites le film avec vos images et votre voix",b6:"Code source (licence MIT) et galerie des sources NASA/JPL",price:"0 €",cta:"Je veux le pack complet",supT:"Le projet reste gratuit. Si vous le souhaitez, vous pouvez le soutenir librement :",gH:"Guide de visionnage",g1:"Pièce sombre, son activé. Le film est lent et contemplatif — ne le brusquez pas.",g2:"Sur écran ou TV : choisissez 2D et passez en plein écran.",g3:"En casque VR BOX / 3DBOX : choisissez 3D SBS demi, téléphone à l'horizontale, plein écran, puis placez-le dans le casque.",g4:"Il dure environ 4,5 minutes. Regardez-le deux fois : la seconde fois, vous voyez ce qui vous a échappé.",mH:"Faites votre propre version",m1:"Ouvrez ODISEEA et chargez les images NASA/JPL ou les vôtres.",m2:"Choisissez la musique et la langue de la narration ; vous pouvez ajouter votre voix.",m3:"Exportez en 2D, SBS demi ou SBS complet (gardez l'onglet au premier plan).",dlH:"Téléchargements",dl2d:"Film 2D",dlSbs:"Film 3D SBS",dlApp:"L'application ODISEEA (un seul fichier HTML)",dlGal:"Galerie des sources NASA/JPL",dlSrc:"Code source (MIT)",fP:"Cette page n'utilise ni cookies, ni scripts externes, ni suivi. Elle n'envoie aucune donnée.",fD:"Projet indépendant, non affilié à la NASA ou au JPL. Les images appartiennent à NASA/JPL-Caltech et à d'autres sources du domaine public ; vérifiez les crédits."},
+it:{skip:"Vai al contenuto",badge:"Anteprima · proiezione online",hc:"Contrasto elevato",title:"Voyager 1 e 2 — Odissea",by:"Un documentario di Alexio, realizzato con ODISEEA",t2d:"2D",t3d:"3D SBS (visore VR)",play:"Riproduci in ODISEEA",soon:"Il film appare qui alla première. Fino ad allora puoi riprodurlo direttamente nell'app.",comH:"Commenti",comT:"Nessun widget esterno, nessun tracciamento. Dicci cosa ne pensi su GitHub o via e-mail.",comGh:"Discuti su GitHub",comMail:"Invia un'e-mail",cdH:"Première online",d:"giorni",h:"ore",m:"min",s:"sec",cdDone:"La première è avvenuta — il film è disponibile.",offH:"Il pacchetto completo — gratuito",offS:"Trade-free: nessun pagamento, nessun account, nessun dato personale.",b1:"Il documentario (~4,5 min) in 2D, Full HD",b2:"La versione 3D SBS (metà e completa) per visori VR BOX / 3DBOX",b3:"Il testo della narrazione e i crediti delle immagini (.txt), in 8 lingue",b4:"Una guida alla visione: come guardarlo in modo contemplativo, su schermo o nel visore",b5:"L'app ODISEEA stessa: rifai il film con le tue immagini e la tua voce",b6:"Codice sorgente (licenza MIT) e galleria delle fonti NASA/JPL",price:"0 €",cta:"Voglio il pacchetto completo",supT:"Il progetto resta gratuito. Se vuoi, puoi sostenerlo volontariamente:",gH:"Guida alla visione",g1:"Stanza buia, audio acceso. Il film è lento e contemplativo — non avere fretta.",g2:"Su schermo o TV: scegli 2D e vai a schermo intero.",g3:"Nei visori VR BOX / 3DBOX: scegli 3D SBS metà, telefono in orizzontale, schermo intero, poi inseriscilo nel visore.",g4:"Dura circa 4,5 minuti. Guardalo due volte: la seconda vedi ciò che ti è sfuggito.",mH:"Crea la tua versione",m1:"Apri ODISEEA e carica le immagini NASA/JPL o le tue.",m2:"Scegli la musica e la lingua della narrazione; puoi caricare la tua voce.",m3:"Esporta 2D, SBS metà o SBS completo (tieni la scheda in primo piano).",dlH:"Download",dl2d:"Film 2D",dlSbs:"Film 3D SBS",dlApp:"L'app ODISEEA (un solo file HTML)",dlGal:"Galleria delle fonti NASA/JPL",dlSrc:"Codice sorgente (MIT)",fP:"Questa pagina non usa cookie, script esterni né tracciamento. Non invia alcun dato.",fD:"Progetto indipendente, non affiliato a NASA o JPL. Le immagini appartengono a NASA/JPL-Caltech e ad altre fonti di pubblico dominio; controlla i crediti."},
+es:{skip:"Saltar al contenido",badge:"Estreno · proyección en línea",hc:"Alto contraste",title:"Voyager 1 y 2 — Odisea",by:"Un documental de Alexio, hecho con ODISEEA",t2d:"2D",t3d:"3D SBS (visor VR)",play:"Reproducir en ODISEEA",soon:"La película aparece aquí en el estreno. Hasta entonces puedes reproducirla directamente en la aplicación.",comH:"Comentarios",comT:"Sin widgets externos ni rastreo. Cuéntanos qué piensas en GitHub o por correo electrónico.",comGh:"Comentar en GitHub",comMail:"Enviar un correo",cdH:"Estreno en línea",d:"días",h:"horas",m:"min",s:"seg",cdDone:"El estreno ya tuvo lugar — la película está disponible.",offH:"El paquete completo — gratis",offS:"Trade-free: sin pago, sin cuenta, sin datos personales.",b1:"El documental (~4,5 min) en 2D, Full HD",b2:"La versión 3D SBS (media y completa) para visores VR BOX / 3DBOX",b3:"El texto de la narración y los créditos de las imágenes (.txt), en 8 idiomas",b4:"Una guía de visionado: cómo verlo de forma contemplativa, en pantalla o con visor",b5:"La propia aplicación ODISEEA: rehaz la película con tus imágenes y tu voz",b6:"Código fuente (licencia MIT) y galería de fuentes NASA/JPL",price:"0 €",cta:"Quiero el paquete completo",supT:"El proyecto sigue siendo gratuito. Si quieres, puedes apoyarlo voluntariamente:",gH:"Guía de visionado",g1:"Habitación oscura, sonido activado. La película es lenta y contemplativa — no la apresures.",g2:"En pantalla o TV: elige 2D y ponla a pantalla completa.",g3:"En visores VR BOX / 3DBOX: elige 3D SBS media, teléfono en horizontal, pantalla completa y colócalo en el visor.",g4:"Dura unos 4,5 minutos. Velo dos veces: la segunda ves lo que se te escapó.",mH:"Haz tu propia versión",m1:"Abre ODISEEA y carga las imágenes NASA/JPL o las tuyas.",m2:"Elige la música y el idioma de la narración; puedes subir tu propia voz.",m3:"Exporta 2D, SBS media o SBS completo (mantén la pestaña en primer plano).",dlH:"Descargas",dl2d:"Película 2D",dlSbs:"Película 3D SBS",dlApp:"La aplicación ODISEEA (un solo archivo HTML)",dlGal:"Galería de fuentes NASA/JPL",dlSrc:"Código fuente (MIT)",fP:"Esta página no usa cookies, scripts externos ni rastreo. No envía ningún dato.",fD:"Proyecto independiente, sin afiliación con la NASA ni el JPL. Las imágenes pertenecen a NASA/JPL-Caltech y a otras fuentes de dominio público; revisa los créditos."},
+pt:{skip:"Saltar para o conteúdo",badge:"Estreia · exibição online",hc:"Alto contraste",title:"Voyager 1 e 2 — Odisseia",by:"Um documentário de Alexio, feito com ODISEEA",t2d:"2D",t3d:"3D SBS (óculos VR)",play:"Reproduzir no ODISEEA",soon:"O filme aparece aqui na estreia. Até lá, pode reproduzi-lo diretamente na aplicação.",comH:"Comentários",comT:"Sem widgets externos nem rastreamento. Diga-nos o que pensa no GitHub ou por e-mail.",comGh:"Comentar no GitHub",comMail:"Enviar um e-mail",cdH:"Estreia online",d:"dias",h:"horas",m:"min",s:"seg",cdDone:"A estreia já aconteceu — o filme está disponível.",offH:"O pacote completo — grátis",offS:"Trade-free: sem pagamento, sem conta, sem dados pessoais.",b1:"O documentário (~4,5 min) em 2D, Full HD",b2:"A versão 3D SBS (meia e completa) para óculos VR BOX / 3DBOX",b3:"O texto da narração e os créditos das imagens (.txt), em 8 idiomas",b4:"Um guia de visualização: como vê-lo de forma contemplativa, no ecrã ou nos óculos",b5:"A própria aplicação ODISEEA: refaça o filme com as suas imagens e a sua voz",b6:"Código-fonte (licença MIT) e galeria das fontes NASA/JPL",price:"0 €",cta:"Quero o pacote completo",supT:"O projeto continua gratuito. Se quiser, pode apoiá-lo voluntariamente:",gH:"Guia de visualização",g1:"Sala escura, som ligado. O filme é lento e contemplativo — não o apresse.",g2:"No ecrã ou TV: escolha 2D e passe para ecrã inteiro.",g3:"Em óculos VR BOX / 3DBOX: escolha 3D SBS meia, telemóvel na horizontal, ecrã inteiro e coloque-o nos óculos.",g4:"Dura cerca de 4,5 minutos. Veja-o duas vezes: à segunda, vê o que lhe escapou.",mH:"Faça a sua própria versão",m1:"Abra o ODISEEA e carregue as imagens NASA/JPL ou as suas.",m2:"Escolha a música e o idioma da narração; pode carregar a sua voz.",m3:"Exporte 2D, SBS meia ou SBS completo (mantenha o separador em primeiro plano).",dlH:"Transferências",dl2d:"Filme 2D",dlSbs:"Filme 3D SBS",dlApp:"A aplicação ODISEEA (um único ficheiro HTML)",dlGal:"Galeria das fontes NASA/JPL",dlSrc:"Código-fonte (MIT)",fP:"Esta página não usa cookies, scripts externos nem rastreamento. Não envia nenhum dado.",fD:"Projeto independente, sem afiliação à NASA ou ao JPL. As imagens pertencem à NASA/JPL-Caltech e a outras fontes de domínio público; verifique os créditos."},
+de:{skip:"Zum Inhalt springen",badge:"Premiere · Online-Vorführung",hc:"Hoher Kontrast",title:"Voyager 1 und 2 — Odyssee",by:"Ein Dokumentarfilm von Alexio, gemacht mit ODISEEA",t2d:"2D",t3d:"3D SBS (VR-Brille)",play:"In ODISEEA abspielen",soon:"Der Film erscheint hier zur Premiere. Bis dahin kannst du ihn direkt in der App abspielen.",comH:"Kommentare",comT:"Keine externen Widgets, kein Tracking. Sag uns auf GitHub oder per E-Mail, was du denkst.",comGh:"Auf GitHub diskutieren",comMail:"E-Mail senden",cdH:"Online-Premiere",d:"Tage",h:"Std.",m:"Min.",s:"Sek.",cdDone:"Die Premiere hat stattgefunden — der Film ist verfügbar.",offH:"Das Komplettpaket — kostenlos",offS:"Trade-free: keine Zahlung, kein Konto, keine persönlichen Daten.",b1:"Der Dokumentarfilm (~4,5 Min.) in 2D, Full HD",b2:"Die 3D-SBS-Version (halb und voll) für VR-BOX-/3DBOX-Brillen",b3:"Erzähltext und Bildnachweise (.txt), in 8 Sprachen",b4:"Ein Sehleitfaden: wie du ihn kontemplativ ansiehst, am Bildschirm oder in der Brille",b5:"Die App ODISEEA selbst: Mach den Film mit eigenen Bildern und eigener Stimme neu",b6:"Quellcode (MIT-Lizenz) und die NASA/JPL-Quellengalerie",price:"0 €",cta:"Ich will das Komplettpaket",supT:"Das Projekt bleibt kostenlos. Wenn du magst, kannst du es freiwillig unterstützen:",gH:"Sehleitfaden",g1:"Dunkler Raum, Ton an. Der Film ist langsam und kontemplativ — dräng ihn nicht.",g2:"Am Bildschirm oder TV: 2D wählen und Vollbild einschalten.",g3:"In VR-BOX-/3DBOX-Brillen: 3D SBS halb wählen, Handy quer, Vollbild, dann in die Brille einlegen.",g4:"Er dauert etwa 4,5 Minuten. Sieh ihn zweimal: Beim zweiten Mal siehst du, was du verpasst hast.",mH:"Mach deine eigene Version",m1:"Öffne ODISEEA und lade die NASA/JPL-Bilder oder eigene.",m2:"Wähle Musik und Sprache der Erzählung; du kannst deine eigene Stimme hochladen.",m3:"Exportiere 2D, SBS halb oder SBS voll (Tab im Vordergrund lassen).",dlH:"Downloads",dl2d:"2D-Film",dlSbs:"3D-SBS-Film",dlApp:"Die App ODISEEA (eine einzige HTML-Datei)",dlGal:"NASA/JPL-Quellengalerie",dlSrc:"Quellcode (MIT)",fP:"Diese Seite verwendet keine Cookies, externen Skripte oder Tracking. Sie sendet keine Daten.",fD:"Unabhängiges Projekt, nicht mit NASA oder JPL verbunden. Die Bilder gehören NASA/JPL-Caltech und anderen gemeinfreien Quellen; bitte Nachweise prüfen."},
+hu:{skip:"Ugrás a tartalomra",badge:"Bemutató · online vetítés",hc:"Magas kontraszt",title:"Voyager 1 és 2 — Odüsszeia",by:"Alexio dokumentumfilmje, ODISEEA-val készült",t2d:"2D",t3d:"3D SBS (VR-szemüveg)",play:"Lejátszás az ODISEEA-ban",soon:"A film a bemutatón jelenik meg itt. Addig közvetlenül az alkalmazásban lejátszhatod.",comH:"Hozzászólások",comT:"Külső widgetek és követés nélkül. Írd meg a véleményed GitHubon vagy e-mailben.",comGh:"Beszélgetés a GitHubon",comMail:"E-mail küldése",cdH:"Online bemutató",d:"nap",h:"óra",m:"perc",s:"mp",cdDone:"A bemutató megtörtént — a film elérhető.",offH:"A teljes csomag — ingyenes",offS:"Trade-free: fizetés, fiók és személyes adatok nélkül.",b1:"A dokumentumfilm (~4,5 perc) 2D-ben, Full HD",b2:"A 3D SBS változat (fél és teljes) VR BOX / 3DBOX szemüvegekhez",b3:"A narráció szövege és a képek forrásmegjelölése (.txt), 8 nyelven",b4:"Nézési útmutató: hogyan nézd elmélyülten, képernyőn vagy szemüvegben",b5:"Maga az ODISEEA alkalmazás: készítsd újra a filmet saját képeiddel és hangoddal",b6:"Forráskód (MIT licenc) és a NASA/JPL forrásgaléria",price:"0 €",cta:"Kérem a teljes csomagot",supT:"A projekt ingyenes marad. Ha szeretnéd, önkéntesen támogathatod:",gH:"Nézési útmutató",g1:"Sötét szoba, bekapcsolt hang. A film lassú és elmélyült — ne siettesd.",g2:"Képernyőn vagy TV-n: válaszd a 2D-t és kapcsolj teljes képernyőre.",g3:"VR BOX / 3DBOX szemüvegben: válaszd a 3D SBS felet, telefon fekvő helyzetben, teljes képernyő, majd tedd a szemüvegbe.",g4:"Körülbelül 4,5 perc. Nézd meg kétszer: másodszorra meglátod, mi maradt ki.",mH:"Készítsd el a saját változatod",m1:"Nyisd meg az ODISEEA-t, és töltsd be a NASA/JPL képeket vagy a sajátjaidat.",m2:"Válaszd ki a zenét és a narráció nyelvét; feltöltheted a saját hangod.",m3:"Exportálj 2D-t, SBS felet vagy teljes SBS-t (tartsd előtérben a lapot).",dlH:"Letöltések",dl2d:"2D film",dlSbs:"3D SBS film",dlApp:"Az ODISEEA alkalmazás (egyetlen HTML-fájl)",dlGal:"NASA/JPL forrásgaléria",dlSrc:"Forráskód (MIT)",fP:"Ez az oldal nem használ sütiket, külső szkripteket vagy követést. Nem küld adatot.",fD:"Független projekt, nem áll kapcsolatban a NASA-val vagy a JPL-lel. A képek a NASA/JPL-Caltech és más közkincs források tulajdonai; ellenőrizd a forrásmegjelöléseket."}
+};
+
+const $=id=>document.getElementById(id);
+let lang="ro",fmt="2d";
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+function setLang(c){
+  if(!L[c])c="en";
+  lang=c;document.documentElement.lang=c;$("lang").value=c;store.set("odiseea.lang",c);
+  const T=L[c];
+  document.querySelectorAll("[data-t]").forEach(e=>{const v=T[e.dataset.t];if(v!=null)e.textContent=v;});
+  document.title="ODISEEA — "+T.badge+" · "+T.title;
+  renderWhen();tick();
+}
+function renderWhen(){
+  const d=new Date(CONFIG.PREMIERE);
+  try{$("when").textContent=new Intl.DateTimeFormat(lang,{dateStyle:"full",timeStyle:"short",timeZone:"Europe/Bucharest"}).format(d)+" (Europe/Bucharest)";}
+  catch(e){$("when").textContent=CONFIG.PREMIERE;}
+}
+function tick(){
+  const t=new Date(CONFIG.PREMIERE).getTime()-Date.now();
+  const done=t<=0,cd=$("cd");
+  cd.hidden=done;$("cdDone").hidden=!done;
+  if(done)return;
+  const s=Math.floor(t/1000);
+  $("cD").textContent=Math.floor(s/86400);
+  $("cH2").textContent=String(Math.floor(s%86400/3600)).padStart(2,"0");
+  $("cM").textContent=String(Math.floor(s%3600/60)).padStart(2,"0");
+  $("cS").textContent=String(s%60).padStart(2,"0");
+}
+function setFmt(f){
+  fmt=f;$("b2d").setAttribute("aria-pressed",f==="2d");$("b3d").setAttribute("aria-pressed",f==="sbs");
+  const u=CONFIG.VIDEO[f],v=$("vid");
+  if(u){v.src=u;v.hidden=false;$("poster").hidden=true;}
+  else{v.pause();v.removeAttribute("src");v.hidden=true;$("poster").hidden=false;}
+}
+function init(){
+  const q=new URLSearchParams(location.search).get("lang");
+  const nav=(navigator.language||"ro").slice(0,2).toLowerCase();
+  setLang(q&&L[q]?q:(store.get("odiseea.lang")&&L[store.get("odiseea.lang")]?store.get("odiseea.lang"):(L[nav]?nav:"ro")));
+  $("lang").addEventListener("change",e=>setLang(e.target.value));
+  $("b2d").onclick=()=>setFmt("2d");$("b3d").onclick=()=>setFmt("sbs");
+  const hc=$("hc");
+  const applyHC=on=>{document.body.classList.toggle("hc",on);hc.setAttribute("aria-pressed",on);store.set("odiseea.hc",on?"1":"0");};
+  applyHC(store.get("odiseea.hc")==="1");
+  hc.onclick=()=>applyHC(!document.body.classList.contains("hc"));
+  if(CONFIG.VIDEO["2d"]){$("dl2d").href=CONFIG.VIDEO["2d"];$("dl2d").hidden=false;}
+  if(CONFIG.VIDEO.sbs){$("dlSbs").href=CONFIG.VIDEO.sbs;$("dlSbs").hidden=false;}
+  setFmt("2d");
+  setInterval(tick,1000);
+}
+init();
+</script>
+</body>
+</html>
