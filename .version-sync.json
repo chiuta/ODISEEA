@@ -1,0 +1,11 @@
+{
+  "pages": ".",
+  "html": [
+    "index.html",
+    "ODISEEA.html"
+  ],
+  "version_from": {
+    "file": "README.md",
+    "regex": "^Version:\\s*([\\w.\\-]+)"
+  }
+}
