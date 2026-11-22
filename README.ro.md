@@ -2,7 +2,7 @@
 
 [English](README.md) · **Română** · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-Versiune: 1.1 · Ultima actualizare: 15 noiembrie 2026
+Versiune: 1.1 · Ultima actualizare: 2026-11-22
 
 Documentar de ~4,5 minute despre **Voyager 1 și 2**, într-un singur fișier HTML care rulează local în browser, fără server și fără instalare.
 

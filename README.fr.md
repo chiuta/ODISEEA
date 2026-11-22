@@ -2,7 +2,7 @@
 
 [English](README.md) · [Română](README.ro.md) · **Français** · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-Version : 1.1 · Dernière mise à jour : 15 novembre 2026
+Version : 1.1 · Dernière mise à jour : 2026-11-22
 
 Documentaire d'environ 4,5 minutes sur **Voyager 1 et 2**, dans un seul fichier HTML qui s'exécute localement dans le navigateur, sans serveur ni installation.
 
