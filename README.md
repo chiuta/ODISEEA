@@ -2,7 +2,7 @@
 
 **English** · [Română](README.ro.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [Español](README.es.md) · [Português](README.pt.md) · [Deutsch](README.de.md) · [Magyar](README.hu.md)
 
-Version: 1.1 · Last updated: 15 November 2026
+Version: 1.1 · Last updated: 2026-11-22
 
 A ~4.5-minute documentary about **Voyager 1 and 2**, in a single HTML file that runs locally in the browser, with no server and no installation.
 
